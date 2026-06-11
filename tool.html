@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音声入力補充登録ツール</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; background-color: #f5f5f5; color: #333; }
+        .container { max-width: 650px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2980b9; font-size: 24px; margin-bottom: 5px; }
+        
+        /* ① 入力バーエリアのスタイル */
+        .meta-input-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+        .meta-input-group div { display: flex; align-items: center; gap: 5px; }
+        .meta-input-group input { padding: 6px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
+        #inputLocation { width: 150px; text-align: center; }
+        #inputDate { width: 140px; }
+
+        .status { padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 20px; font-weight: bold; }
+        .waiting { background-color: #e2e3e5; color: #383d41; }
+        .listening { background-color: #d4edda; color: #155724; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .btn-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        button { flex: 1; padding: 12px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-start { background-color: #28a745; color: white; }
+        .btn-stop { background-color: #dc3545; color: white; }
+        .btn-csv { background-color: #007bff; color: white; width: 100%; margin-top: 20px; }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: center; }
+        th { background-color: #f8f9fa; }
+        .log-box { max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; background: #fafafa; border-radius: 5px; margin-top: 10px; }
+        .guide-box { background-color: #e8f4fd; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 14px; border-left: 5px solid #007bff; }
+        
+        /* ② 削除ボタンのスタイル */
+        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: normal; }
+        .btn-delete:hover { background-color: #c0392b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>音声入力補充登録ツール</h1>
+
+    <div class="meta-input-group">
+        <div>
+            <label for="inputLocation">📍 <b>登録地:</b></label>
+            <input type="text" id="inputLocation" placeholder="例：東京倉庫" value="本社">
+        </div>
+        <div>
+            <label for="inputDate">📅 <b>日付:</b></label>
+            <input type="date" id="inputDate">
+        </div>
+    </div>
+
+    <div class="guide-box">
+        <strong>🎤 喋り方のコツ：</strong><br>
+        「カテゴリー <b>500</b>（一呼吸）追加 <b>にー（2）</b>」のように、追加数は少し語尾を伸ばしてハキハキ言うと捕まえやすくなります！
+    </div>
+    
+    <div id="status" class="status waiting">停止中（ボタンを押して開始）</div>
+    
+    <div class="btn-group">
+        <button id="startBtn" class="btn-start">音声認識 開始</button>
+        <button id="stopBtn" class="btn-stop" disabled>音声認識 停止</button>
+    </div>
+
+    <div><strong>今聞き取った言葉:</strong> <span id="liveText" style="color: blue; font-size: 18px; font-weight: bold;">---</span></div>
+    <div style="font-size: 12px; color: #777; margin-top: 5px;">システム判定結果: <span id="debugText" style="font-weight: bold;">待ち受け中</span></div>
+
+    <h3>読み取りデータ一覧</h3>
+    <div class="log-box">
+        <table>
+            <thead>
+                <tr>
+                    <th>カテゴリー</th>
+                    <th>追加数</th>
+                    <th>操作</th> </tr>
+            </thead>
+            <tbody id="dataTable"></tbody>
+        </table>
+    </div>
+
+    <button id="csvBtn" class="btn-csv" disabled>Excel用CSVをダウンロード</button>
+</div>
+
+<script>
+    // 初期状態で今日の日付を自動入力
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    document.getElementById('inputDate').value = `${yyyy}-${mm}-${dd}`;
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("お使いのブラウザは音声認識に対応していません。Google ChromeやSafariでお試しください。");
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ja-JP';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    let isRunning = false;
+    let dataList = []; // ② 行削除に対応するため let に変更
+
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const csvBtn = document.getElementById('csvBtn');
+    const statusDiv = document.getElementById('status');
+    const liveText = document.getElementById('liveText');
+    const debugText = document.getElementById('debugText');
+    const dataTable = document.getElementById('dataTable');
+
+    function playSuccessBeep() {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function playErrorBeep() {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(150, audioCtx.currentTime);
+        gain1.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start();
+        osc1.stop(audioCtx.currentTime + 0.15);
+
+        setTimeout(() => {
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'sawtooth';
+            osc2.frequency.setValueAtTime(150, audioCtx.currentTime);
+            gain2.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.start();
+            osc2.stop(audioCtx.currentTime + 0.15);
+        }, 100);
+    }
+
+    const categoryMap = {
+        '百': 100, 'ひゃく': 100, '100': 100,
+        '二百': 200, 'にひゃく': 200, '200': 200,
+        '三百': 300, 'さんびゃく': 300, '300': 300,
+        '四百': 400, 'よんひゃく': 400, '400': 400,
+        '五百': 500, 'ごひゃく': 500, '500': 500
+    };
+
+    function parseCount(str) {
+        if (!str) return null;
+        str = str.trim();
+
+        const directConvert = {
+            'い':1, 'いち':1, 'に':2, 'にー':2, 'さん':3, 'し':4, 'よん':4, 'ご':5, 'ろく':6, 'しち':7, 'なな':7, 'はち':8, 'きゅう':9, 'く':9, 'じゅう':10,
+            '一':1, '二':2, '三':3, '四':4, '五':5, '六':6, '七':7, '八':8, '九':9, '十':10
+        };
+        if (directConvert[str]) return directConvert[str];
+
+        str = str.replace(/二十/g, '20').replace(/三十/g, '30').replace(/四十/g, '40').replace(/五十/g, '50').replace(/十/g, '10');
+        const units = {'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9};
+        for(let k in units) { str = str.replace(new RegExp(k, 'g'), units[k]); }
+        
+        if (str.match(/^[2345]0[123456789]$/)) { str = str.charAt(0) + str.charAt(2); } 
+        else if (str.match(/^10[123456789]$/)) { str = '1' + str.charAt(2); }
+
+        let num = parseInt(str.replace(/[^0-9]/g, ''), 10);
+        return isNaN(num) ? null : num;
+    }
+
+    // ② テーブルと配列を再描画する関数
+    function renderTable() {
+        dataTable.innerHTML = "";
+        dataList.forEach((item, index) => {
+            const row = `<tr>
+                <td>${item.category}</td>
+                <td>${item.count}</td>
+                <td><button class="btn-delete" onclick="deleteRow(${index})">削除</button></td>
+            </tr>`;
+            dataTable.insertAdjacentHTML('beforeend', row);
+        });
+        csvBtn.disabled = dataList.length === 0;
+    }
+
+    // ② 指定した行を削除する関数
+    window.deleteRow = function(index) {
+        dataList.splice(index, 1);
+        renderTable();
+        debugText.innerText = "データを1件削除しました。";
+    };
+
+    recognition.onresult = (event) => {
+        let resultText = event.results[event.results.length - 1][0].transcript.trim();
+        liveText.innerText = resultText;
+
+        if (!resultText.includes('カテゴリー') && !resultText.includes('カテゴリ') && !resultText.includes('追加') && !resultText.includes('ついか')) {
+            return; 
+        }
+
+        resultText = resultText.replace(/カテゴリー|カテゴリ/g, 'カテゴリー');
+        resultText = resultText.replace(/追加|ついか|ツイカ/g, '追加');
+
+        let category = null;
+        let count = null;
+
+        if (resultText.includes('カテゴリー')) {
+            let afterCategory = "";
+            if (resultText.includes('追加')) {
+                afterCategory = resultText.split('カテゴリー')[1].split('追加')[0].trim();
+            } else {
+                afterCategory = resultText.split('カテゴリー')[1].trim();
+            }
+            category = categoryMap[afterCategory] || parseInt(afterCategory.replace(/[^0-9]/g, ''), 10);
+        }
+
+        if (resultText.includes('追加')) {
+            let afterCount = resultText.split('追加')[1].trim();
+            count = parseCount(afterCount);
+        }
+
+        debugText.innerText = `判定中 -> カテゴリー: ${category} / 追加数: ${count}`;
+
+        if ([100, 200, 300, 400, 500].includes(category) && count >= 1 && count <= 50) {
+            dataList.push({ category, count });
+            renderTable(); // 再描画
+            playSuccessBeep();
+            debugText.innerText = `成功！ -> 追加しました（${category} / ${count}）`;
+        } else {
+            playErrorBeep();
+            debugText.innerText = `エラー -> 条件に合いません（カテゴリー:${category}、追加数:${count}）`;
+        }
+    };
+
+    recognition.onend = () => { if (isRunning) recognition.start(); };
+
+    startBtn.addEventListener('click', () => {
+        isRunning = true;
+        recognition.start();
+        statusDiv.innerText = "音声聞き取り中...";
+        statusDiv.className = "status listening";
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+    });
+
+    stopBtn.addEventListener('click', () => {
+        isRunning = false;
+        recognition.stop();
+        statusDiv.innerText = "停止中（ボタンを押して開始）";
+        statusDiv.className = "status waiting";
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+    });
+
+    csvBtn.addEventListener('click', () => {
+        if (dataList.length === 0) return;
+        
+        // ① ファイル名の生成ロジック
+        const locationStr = document.getElementById('inputLocation').value.trim() || "未指定";
+        const rawDate = document.getElementById('inputDate').value; // YYYY-MM-DD
+        const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明"; // YYYYMMDD
+        
+        const fileName = `${dateStr}_${locationStr}補充伝票.csv`;
+
+        let csvContent = "カテゴリー,追加数\r\n";
+        dataList.forEach(item => { csvContent += `${item.category},${item.count}\r\n`; });
+        const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+        const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        
+        link.setAttribute("href", url);
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+</script>
+
+</body>
+</html>
