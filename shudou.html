@@ -204,7 +204,6 @@
             return;
         }
 
-        // マイナス符号を一時的に外して数字部分だけで処理
         let isMinus = currentCountStr.startsWith('-');
         let pureNumStr = isMinus ? currentCountStr.slice(1) : currentCountStr;
 
@@ -215,19 +214,13 @@
             pureNumStr += num;
         }
 
-        // 上限50個に制限
-        if (parseInt(pureNumStr, 10) > 50) {
-            pureNumStr = "50";
-        }
-
-        // マイナスを戻す
+        // ⚠️【変更点】上限「50」の制限を完全解除しました！何桁でも入力可能です
         currentCountStr = (isMinus ? '-' : '') + pureNumStr;
 
         updateDisplay();
         playBeep(1200, 0.03);
     }
 
-    // マイナスの付け外し（符号反転）
     function toggleMinus() {
         if (selectedCategory === null) {
             alert("先に上のカプセル単価（カテゴリー）を選択してください！");
@@ -249,7 +242,6 @@
             currentCountStr = "0";
             playBeep(600, 0.08);
         } else if (action === 'Del') {
-            // マイナスだけの状態、または1文字だけの場合は0に戻す
             if (currentCountStr === "-0" || currentCountStr === "-" || currentCountStr.length <= 1) {
                 currentCountStr = "0";
             } else {
@@ -264,7 +256,7 @@
                 return;
             }
             if (isNaN(count) || count === 0) {
-                alert("補充数を1以上、またはマイナスの数で入力してください。");
+                alert("補充数を入力してください。");
                 return;
             }
 
@@ -328,6 +320,8 @@
         const rawDate = document.getElementById('inputDate').value;
         const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
         const nameSuffix = workerStr ? `_${workerStr}` : "";
+        
+        // 📝【変更点】ファイル名を shudou.html にあわせて綺麗に整理しました
         const fileName = `${dateStr}_${locationStr}${nameSuffix}補充伝票(手入力).csv`;
 
         let csvContent = "カテゴリー,追加数\r\n";
