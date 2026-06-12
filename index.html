@@ -9,11 +9,13 @@
         .container { max-width: 650px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: #2980b9; font-size: 24px; margin-bottom: 5px; }
         
-        .meta-input-group { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; }
+        /* 📝 入力エリアのレイアウト調整 */
+        .meta-input-group { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; background: #fdfefe; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; }
         .meta-input-group div { display: flex; align-items: center; gap: 5px; }
         .meta-input-group input { padding: 6px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
-        #inputLocation { width: 150px; text-align: center; }
-        #inputDate { width: 140px; }
+        #inputLocation { width: 110px; text-align: center; }
+        #inputWorker { width: 100px; text-align: center; }
+        #inputDate { width: 130px; }
 
         .status { padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 20px; font-weight: bold; }
         .waiting { background-color: #e2e3e5; color: #383d41; }
@@ -25,7 +27,6 @@
         .btn-start { background-color: #28a745; color: white; }
         .btn-stop { background-color: #dc3545; color: white; }
         
-        /* 💾 保存・クリアボタン用のスタイル */
         .save-group { display: flex; gap: 10px; margin-bottom: 20px; }
         .btn-save { background-color: #f39c12; color: white; padding: 10px; font-size: 14px; }
         .btn-clear { background-color: #7f8c8d; color: white; padding: 10px; font-size: 14px; }
@@ -49,11 +50,15 @@
 
     <div class="meta-input-group">
         <div>
-            <label for="inputLocation">📍 <b>登録地:</b></label>
+            <label for="inputLocation">📍<b>登録地:</b></label>
             <input type="text" id="inputLocation" placeholder="例：東京倉庫" value="本社">
         </div>
         <div>
-            <label for="inputDate">📅 <b>日付:</b></label>
+            <label for="inputWorker">👤<b>作業者:</b></label>
+            <input type="text" id="inputWorker" placeholder="例：山田">
+        </div>
+        <div>
+            <label for="inputDate">📅<b>日付:</b></label>
             <input type="date" id="inputDate">
         </div>
     </div>
@@ -71,12 +76,12 @@
     </div>
 
     <div class="save-group">
-        <button id="saveBtn" class="btn-save">💾 データを一時保存する</button>
+        <button id="saveBtn" class="btn-save">💾 データを手動保存</button>
         <button id="clearBtn" class="btn-clear">🗑️ 画面をクリア（新規作成）</button>
     </div>
 
     <div><strong>今聞き取った言葉:</strong> <span id="liveText" style="color: blue; font-size: 18px; font-weight: bold;">---</span></div>
-    <div style="font-size: 12px; color: #777; margin-top: 5px;">システム判定結果: <span id="debugText" style="font-weight: bold;">待ち受け中</span></div>
+    <div style="font-size: 12px; color: #777; margin-top: 5px;">システム状態: <span id="debugText" style="font-weight: bold;">待ち受け中</span></div>
 
     <h3>読み取りデータ一覧</h3>
     <div class="log-box">
@@ -121,47 +126,55 @@
 
     // 🕒 画面が開いた時の処理（データの復元）
     window.addEventListener('DOMContentLoaded', () => {
-        // 初期状態の日付（今日）
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
         const dd = String(today.getDate()).padStart(2, '0');
         document.getElementById('inputDate').value = `${yyyy}-${mm}-${dd}`;
 
-        // 保存されたデータがあれば読み込む
         const savedData = localStorage.getItem('hojuu_saved_data');
         const savedLocation = localStorage.getItem('hojuu_saved_location');
+        const savedWorker = localStorage.getItem('hojuu_saved_worker');
         const savedDate = localStorage.getItem('hojuu_saved_date');
 
         if (savedData) {
             dataList = JSON.parse(savedData);
             renderTable();
-            debugText.innerText = "⚠️ 前回の未保存データを復元しました！";
+            debugText.innerText = "⚠️ 前回のデータを自動復元しました！";
         }
         if (savedLocation) document.getElementById('inputLocation').value = savedLocation;
+        if (savedWorker) document.getElementById('inputWorker').value = savedWorker;
         if (savedDate) document.getElementById('inputDate').value = savedDate;
     });
 
-    // 💾 データを保存する関数
-    saveBtn.addEventListener('click', () => {
+    // 💾 データを保存する共通関数（オートセーブ対応）
+    function saveToStorage(isManual = false) {
         localStorage.setItem('hojuu_saved_data', JSON.stringify(dataList));
         localStorage.setItem('hojuu_saved_location', document.getElementById('inputLocation').value);
+        localStorage.setItem('hojuu_saved_worker', document.getElementById('inputWorker').value);
         localStorage.setItem('hojuu_saved_date', document.getElementById('inputDate').value);
         
-        // 成功のピピッ音
-        playSuccessBeep();
-        alert("現在のデータを端末内に一時保存しました！ブラウザを閉じても消えません。");
+        if (isManual) {
+            playSuccessBeep();
+            alert("現在のデータを端末内に保存しました！");
+        }
+    }
+
+    // 手動保存ボタン
+    saveBtn.addEventListener('click', () => {
+        saveToStorage(true);
     });
 
-    // 🗑️ 画面と記憶をクリアする関数
+    // 🗑️ 画面と記憶をクリア
     clearBtn.addEventListener('click', () => {
         if (confirm("画面のデータを一括クリアします。よろしいですか？（端末内の保存データも消去されます）")) {
             dataList = [];
             renderTable();
             localStorage.removeItem('hojuu_saved_data');
             localStorage.removeItem('hojuu_saved_location');
+            localStorage.removeItem('hojuu_saved_worker');
             localStorage.removeItem('hojuu_saved_date');
-            debugText.innerText = "データをクリアしました。";
+            debugText.innerText = "データを完全にクリアしました。";
         }
     });
 
@@ -248,7 +261,8 @@
     window.deleteRow = function(index) {
         dataList.splice(index, 1);
         renderTable();
-        debugText.innerText = "データを1件削除しました。（※自動保存はされていません。確定するには再度一時保存を押してください）";
+        saveToStorage(); // 削除時もオートセーブ
+        debugText.innerText = "データを1件削除しました。";
     };
 
     recognition.onresult = (event) => {
@@ -285,8 +299,9 @@
         if ([100, 200, 300, 400, 500].includes(category) && count >= 1 && count <= 50) {
             dataList.push({ category, count });
             renderTable();
+            saveToStorage(); // ✨追加に成功したらその場でオートセーブ！
             playSuccessBeep();
-            debugText.innerText = `成功！ -> 追加しました（${category} / ${count}）`;
+            debugText.innerText = `自動保存済 -> 追加（${category} / ${count}）`;
         } else {
             playErrorBeep();
             debugText.innerText = `エラー -> 条件に合いません（カテゴリー:${category}、追加数:${count}）`;
@@ -311,16 +326,20 @@
         statusDiv.className = "status waiting";
         startBtn.disabled = false;
         stopBtn.disabled = true;
+        saveToStorage(); // 停止時にも最新の入力内容を念のため保存
     });
 
     csvBtn.addEventListener('click', () => {
         if (dataList.length === 0) return;
         
         const locationStr = document.getElementById('inputLocation').value.trim() || "未指定";
+        const workerStr = document.getElementById('inputWorker').value.trim() || "";
         const rawDate = document.getElementById('inputDate').value;
         const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
         
-        const fileName = `${dateStr}_${locationStr}補充伝票.csv`;
+        // 👤 ファイル名に「作業者名」をドッキング
+        const nameSuffix = workerStr ? `_${workerStr}` : "";
+        const fileName = `${dateStr}_${locationStr}${nameSuffix}補充伝票.csv`;
 
         let csvContent = "カテゴリー,追加数\r\n";
         dataList.forEach(item => { csvContent += `${item.category},${item.count}\r\n`; });
