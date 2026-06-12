@@ -5,42 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>音声入力補充登録ツール</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 30px; background-color: #f5f5f5; color: #333; }
-        .container { max-width: 650px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #2980b9; font-size: 24px; margin-bottom: 5px; }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; margin: 15px; background-color: #f5f5f5; color: #333; font-size: 14px; }
+        .container { max-width: 650px; margin: 0 auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2980b9; font-size: 20px; margin-top: 5px; margin-bottom: 15px; }
         
-        /* 📝 入力エリアのレイアウト調整 */
-        .meta-input-group { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; background: #fdfefe; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; }
-        .meta-input-group div { display: flex; align-items: center; gap: 5px; }
-        .meta-input-group input { padding: 6px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; }
-        #inputLocation { width: 110px; text-align: center; }
-        #inputWorker { width: 100px; text-align: center; }
-        #inputDate { width: 130px; }
+        /* 📱 スマホ画面に完全最適化した入力エリア */
+        .meta-input-group { background: #fdfefe; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 15px; display: flex; flex-direction: column; }
+        
+        /* 📅 日付：右側・やや小さめ */
+        .meta-row-date { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; font-size: 12px; width: 100%; }
+        .meta-row-date label { font-weight: bold; color: #718096; margin-right: 5px; }
+        .meta-row-date input { width: 130px; padding: 5px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; text-align: center; background-color: #f7fafc; }
 
-        .status { padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 20px; font-weight: bold; }
+        /* 📍 登録地・👤 作業者：中央配置・同じ大きさ */
+        .meta-row-center { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; font-size: 14px; width: 100%; }
+        .meta-row-center:last-child { margin-bottom: 0; }
+        .meta-row-center label { font-weight: bold; color: #4a5568; margin-right: 8px; width: 60px; text-align: right; }
+        .meta-row-center input { width: 160px; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+
+        .status { padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 15px; font-weight: bold; }
         .waiting { background-color: #e2e3e5; color: #383d41; }
         .listening { background-color: #d4edda; color: #155724; animation: blink 1.5s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         
         .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        button { flex: 1; padding: 12px; font-size: 16px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button { flex: 1; padding: 12px; font-size: 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center; }
         .btn-start { background-color: #28a745; color: white; }
         .btn-stop { background-color: #dc3545; color: white; }
         
         .save-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        .btn-save { background-color: #f39c12; color: white; padding: 10px; font-size: 14px; }
-        .btn-clear { background-color: #7f8c8d; color: white; padding: 10px; font-size: 14px; }
-        .btn-csv { background-color: #007bff; color: white; width: 100%; margin-top: 20px; }
+        .btn-save { background-color: #f39c12; color: white; padding: 10px; font-size: 13px; }
+        .btn-clear { background-color: #7f8c8d; color: white; padding: 10px; font-size: 13px; }
+        .btn-csv { background-color: #007bff; color: white; width: 100%; margin-top: 20px; padding: 14px; font-size: 16px; }
         button:disabled { background-color: #cccccc; cursor: not-allowed; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 14px; }
+        th, td { border: 1px solid #dee2e6; padding: 8px; text-align: center; }
         th { background-color: #f8f9fa; }
-        .log-box { max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; background: #fafafa; border-radius: 5px; margin-top: 10px; }
-        .guide-box { background-color: #e8f4fd; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 14px; border-left: 5px solid #007bff; }
+        .log-box { max-height: 250px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; background: #fafafa; border-radius: 5px; margin-top: 5px; }
         
-        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: normal; }
-        .btn-delete:hover { background-color: #c0392b; }
+        .guide-box { background-color: #e8f4fd; padding: 12px; border-radius: 5px; margin-bottom: 15px; font-size: 13px; border-left: 5px solid #007bff; line-height: 1.5; }
+        .guide-title { font-weight: bold; color: #007bff; margin-bottom: 5px; display: flex; align-items: center; gap: 4px; }
+        
+        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -49,23 +57,24 @@
     <h1>音声入力補充登録ツール</h1>
 
     <div class="meta-input-group">
-        <div>
-            <label for="inputLocation">📍<b>登録地:</b></label>
+        <div class="meta-row-date">
+            <label for="inputDate">📅 日付:</label>
+            <input type="date" id="inputDate">
+        </div>
+        <div class="meta-row-center">
+            <label for="inputLocation">📍 登録地:</label>
             <input type="text" id="inputLocation" placeholder="例：東京倉庫" value="本社">
         </div>
-        <div>
-            <label for="inputWorker">👤<b>作業者:</b></label>
+        <div class="meta-row-center">
+            <label for="inputWorker">👤 作業者:</label>
             <input type="text" id="inputWorker" placeholder="例：山田">
-        </div>
-        <div>
-            <label for="inputDate">📅<b>日付:</b></label>
-            <input type="date" id="inputDate">
         </div>
     </div>
 
     <div class="guide-box">
-        <strong>🎤 喋り方のコツ：</strong><br>
-        「カテゴリー <b>500</b>（一呼吸）追加 <b>にー（2）</b>」のように、追加数は少し語尾を伸ばしてハキハキ言うと捕まえやすくなります！
+        <div class="guide-title">🎤 喋り方のコツ</div>
+        普通に「<b>カテゴリー（カプセル単価）</b>」と言ったあと、<b>一拍（1秒ほど）あけて</b>「<b>追加（補充数）</b>」とハキハキ伝えると正確に読み取れます。<br>
+        <span style="color: #666; font-size: 11px;">例：「カテゴリー 500 ……（あける）…… 追加 にー」</span>
     </div>
     
     <div id="status" class="status waiting">停止中（ボタンを押して開始）</div>
@@ -80,17 +89,19 @@
         <button id="clearBtn" class="btn-clear">🗑️ 画面をクリア（新規作成）</button>
     </div>
 
-    <div><strong>今聞き取った言葉:</strong> <span id="liveText" style="color: blue; font-size: 18px; font-weight: bold;">---</span></div>
-    <div style="font-size: 12px; color: #777; margin-top: 5px;">システム状態: <span id="debugText" style="font-weight: bold;">待ち受け中</span></div>
+    <div style="background: #fff; padding: 8px; border: 1px dashed #bbb; border-radius: 5px; margin-bottom: 10px;">
+        <div><strong>今聞き取った言葉:</strong> <span id="liveText" style="color: blue; font-size: 16px; font-weight: bold;">---</span></div>
+        <div style="font-size: 11px; color: #777; margin-top: 4px;">状態: <span id="debugText" style="font-weight: bold;">待ち受け中</span></div>
+    </div>
 
-    <h3>読み取りデータ一覧</h3>
+    <h3 style="font-size: 15px; margin-bottom: 5px; margin-top: 15px;">読み取りデータ一覧</h3>
     <div class="log-box">
         <table>
             <thead>
                 <tr>
-                    <th>カテゴリー</th>
-                    <th>追加数</th>
-                    <th>操作</th>
+                    <th style="width: 45%;">カテゴリー</th>
+                    <th style="width: 30%;">追加数</th>
+                    <th style="width: 25%;">操作</th>
                 </tr>
             </thead>
             <tbody id="dataTable"></tbody>
@@ -124,7 +135,6 @@
     const debugText = document.getElementById('debugText');
     const dataTable = document.getElementById('dataTable');
 
-    // 🕒 画面が開いた時の処理（データの復元）
     window.addEventListener('DOMContentLoaded', () => {
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -147,7 +157,6 @@
         if (savedDate) document.getElementById('inputDate').value = savedDate;
     });
 
-    // 💾 データを保存する共通関数（オートセーブ対応）
     function saveToStorage(isManual = false) {
         localStorage.setItem('hojuu_saved_data', JSON.stringify(dataList));
         localStorage.setItem('hojuu_saved_location', document.getElementById('inputLocation').value);
@@ -160,12 +169,10 @@
         }
     }
 
-    // 手動保存ボタン
     saveBtn.addEventListener('click', () => {
         saveToStorage(true);
     });
 
-    // 🗑️ 画面と記憶をクリア
     clearBtn.addEventListener('click', () => {
         if (confirm("画面のデータを一括クリアします。よろしいですか？（端末内の保存データも消去されます）")) {
             dataList = [];
@@ -261,7 +268,7 @@
     window.deleteRow = function(index) {
         dataList.splice(index, 1);
         renderTable();
-        saveToStorage(); // 削除時もオートセーブ
+        saveToStorage();
         debugText.innerText = "データを1件削除しました。";
     };
 
@@ -299,7 +306,7 @@
         if ([100, 200, 300, 400, 500].includes(category) && count >= 1 && count <= 50) {
             dataList.push({ category, count });
             renderTable();
-            saveToStorage(); // ✨追加に成功したらその場でオートセーブ！
+            saveToStorage();
             playSuccessBeep();
             debugText.innerText = `自動保存済 -> 追加（${category} / ${count}）`;
         } else {
@@ -326,7 +333,7 @@
         statusDiv.className = "status waiting";
         startBtn.disabled = false;
         stopBtn.disabled = true;
-        saveToStorage(); // 停止時にも最新の入力内容を念のため保存
+        saveToStorage();
     });
 
     csvBtn.addEventListener('click', () => {
@@ -337,7 +344,6 @@
         const rawDate = document.getElementById('inputDate').value;
         const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
         
-        // 👤 ファイル名に「作業者名」をドッキング
         const nameSuffix = workerStr ? `_${workerStr}` : "";
         const fileName = `${dateStr}_${locationStr}${nameSuffix}補充伝票.csv`;
 
