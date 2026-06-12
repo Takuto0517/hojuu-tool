@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>補充登録ツール（手入力版）</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; margin: 15px; background-color: #f5f5f5; color: #333; font-size: 14px; }
+        .container { max-width: 650px; margin: 0 auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; font-size: 20px; margin-top: 5px; margin-bottom: 15px; }
+        
+        /* 📱 スマホ画面に完全最適化した入力エリア */
+        .meta-input-group { background: #fdfefe; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 15px; display: flex; flex-direction: column; }
+        
+        /* 📅 日付：右側・やや小さめ */
+        .meta-row-date { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; font-size: 12px; width: 100%; }
+        .meta-row-date label { font-weight: bold; color: #718096; margin-right: 5px; }
+        .meta-row-date input { width: 130px; padding: 5px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; text-align: center; background-color: #f7fafc; }
+
+        /* 📍 登録地・👤 作業者：中央配置・同じ大きさ */
+        .meta-row-center { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; font-size: 14px; width: 100%; }
+        .meta-row-center:last-child { margin-bottom: 0; }
+        .meta-row-center label { font-weight: bold; color: #4a5568; margin-right: 8px; width: 60px; text-align: right; }
+        .meta-row-center input { width: 160px; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+
+        /* 💾 保存・クリアボタン */
+        .save-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn-save { background-color: #f39c12; color: white; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 5px; flex: 1; cursor: pointer; text-align: center; }
+        .btn-clear { background-color: #7f8c8d; color: white; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 5px; flex: 1; cursor: pointer; text-align: center; }
+
+        /* 📁 カテゴリー選択エリア */
+        .section-title { font-size: 13px; font-weight: bold; color: #7f8c8d; margin-bottom: 6px; margin-top: 10px; }
+        .category-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 15px; }
+        .btn-category { background: white; border: 2px solid #cbd5e1; border-radius: 8px; padding: 12px 0; font-size: 15px; font-weight: bold; color: #475569; cursor: pointer; text-align: center; }
+        .btn-category.selected { background: #e0f2fe; border-color: #0284c7; color: #0369a1; box-shadow: 0 0 0 2px rgba(3,105,161,0.2); }
+
+        /* 🔢 電卓風入力表示・テンキーエリア */
+        .calc-display { background: #1e293b; color: #38bdf8; font-size: 26px; font-weight: bold; text-align: right; padding: 12px; border-radius: 6px; margin-bottom: 10px; min-height: 55px; font-family: monospace; letter-spacing: 1px; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 15px; }
+        .btn-calc { background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 16px 0; font-size: 18px; font-weight: bold; color: #1f2937; cursor: pointer; text-align: center; user-select: none; }
+        .btn-calc:active { background: #f3f4f6; }
+        .btn-calc.action { color: #d97706; background: #fffbeb; border-color: #fde68a; }
+        .btn-calc.ok { grid-row: span 2; display: flex; align-items: center; justify-content: center; background: #ef4444; color: white; border-color: #dc2626; font-size: 20px; }
+        .btn-calc.ok:active { background: #dc2626; }
+
+        /* 📋 履歴テーブル */
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 14px; }
+        th, td { border: 1px solid #dee2e6; padding: 8px; text-align: center; }
+        th { background-color: #f8f9fa; }
+        .log-box { max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; background: #fafafa; border-radius: 5px; margin-top: 5px; }
+        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        .btn-csv { background-color: #007bff; color: white; width: 100%; margin-top: 15px; padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-csv:disabled { background-color: #cccccc; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>補充登録ツール（手入力版）</h1>
+
+    <div class="meta-input-group">
+        <div class="meta-row-date">
+            <label for="inputDate">📅 日付:</label>
+            <input type="date" id="inputDate">
+        </div>
+        <div class="meta-row-center">
+            <label for="inputLocation">📍 登録地:</label>
+            <input type="text" id="inputLocation" placeholder="例：東京倉庫" value="本社">
+        </div>
+        <div class="meta-row-center">
+            <label for="inputWorker">👤 作業者:</label>
+            <input type="text" id="inputWorker" placeholder="例：山田">
+        </div>
+    </div>
+
+    <div class="save-group">
+        <button id="saveBtn" class="btn-save">💾 データを手動保存</button>
+        <button id="clearBtn" class="btn-clear">🗑️ 画面をクリア（新規作成）</button>
+    </div>
+
+    <div class="section-title">① カプセル単価（カテゴリー）を選択</div>
+    <div class="category-grid">
+        <button class="btn-category" onclick="selectCategory(100)">100</button>
+        <button class="btn-category" onclick="selectCategory(200)">200</button>
+        <button class="btn-category" onclick="selectCategory(300)">300</button>
+        <button class="btn-category" onclick="selectCategory(400)">400</button>
+        <button class="btn-category" onclick="selectCategory(500)">500</button>
+    </div>
+
+    <div class="section-title">② 補充数を入力して「OK」で確定</div>
+    <div id="calcDisplay" class="calc-display">単価を選んでください</div>
+
+    <div class="calc-grid">
+        <button class="btn-calc" onclick="pressNum('7')">7</button>
+        <button class="btn-calc" onclick="pressNum('8')">8</button>
+        <button class="btn-calc" onclick="pressNum('9')">9</button>
+        <button class="btn-calc action" onclick="pressAction('AC')">AC</button>
+
+        <button class="btn-calc" onclick="pressNum('4')">4</button>
+        <button class="btn-calc" onclick="pressNum('5')">5</button>
+        <button class="btn-calc" onclick="pressNum('6')">6</button>
+        <button class="btn-calc action" onclick="pressAction('Del')">Del</button>
+
+        <button class="btn-calc" onclick="pressNum('1')">1</button>
+        <button class="btn-calc" onclick="pressNum('2')">2</button>
+        <button class="btn-calc" onclick="pressNum('3')">3</button>
+        <button class="btn-calc ok" onclick="pressAction('OK')">OK<br>確定</button>
+
+        <button class="btn-calc" style="grid-column: span 2;" onclick="pressNum('0')">0</button>
+        <button class="btn-calc" onclick="pressNum('00')">00</button>
+    </div>
+
+    <h3 style="font-size: 15px; margin-bottom: 5px; margin-top: 15px;">登録データ一覧</h3>
+    <div class="log-box">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 45%;">カテゴリー</th>
+                    <th style="width: 30%;">追加数</th>
+                    <th style="width: 25%;">操作</th>
+                </tr>
+            </thead>
+            <tbody id="dataTable"></tbody>
+        </table>
+    </div>
+
+    <button id="csvBtn" class="btn-csv" disabled>Excel用CSVをダウンロード</button>
+</div>
+
+<script>
+    let dataList = [];
+    let selectedCategory = null;
+    let currentCountStr = "";
+
+    const calcDisplay = document.getElementById('calcDisplay');
+    const dataTable = document.getElementById('dataTable');
+    const csvBtn = document.getElementById('csvBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        document.getElementById('inputDate').value = `${yyyy}-${mm}-${dd}`;
+
+        const savedData = localStorage.getItem('hojuu_hand_data');
+        const savedLocation = localStorage.getItem('hojuu_hand_location');
+        const savedWorker = localStorage.getItem('hojuu_hand_worker');
+        const savedDate = localStorage.getItem('hojuu_hand_date');
+
+        if (savedData) {
+            dataList = JSON.parse(savedData);
+            renderTable();
+        }
+        if (savedLocation) document.getElementById('inputLocation').value = savedLocation;
+        if (savedWorker) document.getElementById('inputWorker').value = savedWorker;
+        if (savedDate) document.getElementById('inputDate').value = savedDate;
+
+        updateDisplay();
+    });
+
+    function saveToStorage(isManual = false) {
+        localStorage.setItem('hojuu_hand_data', JSON.stringify(dataList));
+        localStorage.setItem('hojuu_hand_location', document.getElementById('inputLocation').value);
+        localStorage.setItem('hojuu_hand_worker', document.getElementById('inputWorker').value);
+        localStorage.setItem('hojuu_hand_date', document.getElementById('inputDate').value);
+        
+        if (isManual) {
+            playBeep(1000, 0.1);
+            alert("現在のデータを端末内に保存しました！");
+        }
+    }
+
+    saveBtn.addEventListener('click', () => saveToStorage(true));
+
+    clearBtn.addEventListener('click', () => {
+        if (confirm("画面のデータを一括クリアします。よろしいですか？")) {
+            dataList = [];
+            renderTable();
+            localStorage.removeItem('hojuu_hand_data');
+            localStorage.removeItem('hojuu_hand_location');
+            localStorage.removeItem('hojuu_hand_worker');
+            localStorage.removeItem('hojuu_hand_date');
+            selectedCategory = null;
+            currentCountStr = "";
+            document.querySelectorAll('.btn-category').forEach(b => b.classList.remove('selected'));
+            updateDisplay();
+        }
+    });
+
+    function selectCategory(num) {
+        selectedCategory = num;
+        document.querySelectorAll('.btn-category').forEach(btn => {
+            btn.classList.remove('selected');
+            if(parseInt(btn.innerText, 10) === num) btn.classList.add('selected');
+        });
+        if(currentCountStr === "") currentCountStr = "0";
+        updateDisplay();
+        playBeep(800, 0.05);
+    }
+
+    function pressNum(num) {
+        if (selectedCategory === null) {
+            alert("先に上のカプセル単価（カテゴリー）を選択してください！");
+            return;
+        }
+        if (currentCountStr === "0") {
+            if (num === "0" || num === "00") return;
+            currentCountStr = num;
+        } else {
+            currentCountStr += num;
+        }
+        if (parseInt(currentCountStr, 10) > 50) {
+            currentCountStr = "50";
+        }
+        updateDisplay();
+        playBeep(1200, 0.03);
+    }
+
+    function pressAction(action) {
+        if (action === 'AC') {
+            currentCountStr = "0";
+            playBeep(600, 0.08);
+        } else if (action === 'Del') {
+            if (currentCountStr.length > 1) {
+                currentCountStr = currentCountStr.slice(0, -1);
+            } else {
+                currentCountStr = "0";
+            }
+            playBeep(600, 0.05);
+        } else if (action === 'OK') {
+            const count = parseInt(currentCountStr, 10);
+            if (selectedCategory === null) {
+                alert("カプセル単価を選択してください。");
+                return;
+            }
+            if (isNaN(count) || count <= 0) {
+                alert("補充数を1以上で入力してください。");
+                return;
+            }
+
+            dataList.push({ category: selectedCategory, count: count });
+            renderTable();
+            saveToStorage();
+            
+            currentCountStr = "0";
+            playBeep(1000, 0.15);
+        }
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        if (selectedCategory === null) {
+            calcDisplay.innerHTML = `<span style="font-size:14px; color:#64748b;">単価を選んでください</span>`;
+        } else {
+            const displayNum = currentCountStr === "" ? "0" : currentCountStr;
+            calcDisplay.innerHTML = `<span style="font-size:13px; color:#94a3b8; float:left;">単価:${selectedCategory} ➔ </span> ${displayNum} <span style="font-size:16px; color:#64748b;">個</span>`;
+        }
+    }
+
+    function renderTable() {
+        dataTable.innerHTML = "";
+        dataList.forEach((item, index) => {
+            const row = `<tr>
+                <td>${item.category}</td>
+                <td>${item.count}</td>
+                <td><button class="btn-delete" onclick="deleteRow(${index})">削除</button></td>
+            </tr>`;
+            dataTable.insertAdjacentHTML('beforeend', row);
+        });
+        csvBtn.disabled = dataList.length === 0;
+    }
+
+    window.deleteRow = function(index) {
+        dataList.splice(index, 1);
+        renderTable();
+        saveToStorage();
+    };
+
+    function playBeep(freq, duration) {
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    }
+
+    csvBtn.addEventListener('click', () => {
+        if (dataList.length === 0) return;
+        const locationStr = document.getElementById('inputLocation').value.trim() || "未指定";
+        const workerStr = document.getElementById('inputWorker').value.trim() || "";
+        const rawDate = document.getElementById('inputDate').value;
+        const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
+        const nameSuffix = workerStr ? `_${workerStr}` : "";
+        const fileName = `${dateStr}_${locationStr}${nameSuffix}補充伝票(手入力).csv`;
+
+        let csvContent = "カテゴリー,追加数\r\n";
+        dataList.forEach(item => { csvContent += `${item.category},${item.count}\r\n`; });
+        const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+        const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+</script>
+
+</body>
+</html>
