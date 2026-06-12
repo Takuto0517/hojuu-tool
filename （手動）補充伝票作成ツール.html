@@ -10,15 +10,11 @@
         .container { max-width: 650px; margin: 0 auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         h1 { text-align: center; color: #2c3e50; font-size: 20px; margin-top: 5px; margin-bottom: 15px; }
         
-        /* 📱 スマホ画面に完全最適化した入力エリア */
+        /* 📱 スマホ用入力エリア */
         .meta-input-group { background: #fdfefe; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 15px; display: flex; flex-direction: column; }
-        
-        /* 📅 日付：右側・やや小さめ */
         .meta-row-date { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; font-size: 12px; width: 100%; }
         .meta-row-date label { font-weight: bold; color: #718096; margin-right: 5px; }
         .meta-row-date input { width: 130px; padding: 5px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; text-align: center; background-color: #f7fafc; }
-
-        /* 📍 登録地・👤 作業者：中央配置・同じ大きさ */
         .meta-row-center { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; font-size: 14px; width: 100%; }
         .meta-row-center:last-child { margin-bottom: 0; }
         .meta-row-center label { font-weight: bold; color: #4a5568; margin-right: 8px; width: 60px; text-align: right; }
@@ -29,13 +25,13 @@
         .btn-save { background-color: #f39c12; color: white; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 5px; flex: 1; cursor: pointer; text-align: center; }
         .btn-clear { background-color: #7f8c8d; color: white; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 5px; flex: 1; cursor: pointer; text-align: center; }
 
-        /* 📁 カテゴリー選択エリア */
+        /* 📁 カテゴリー選択 */
         .section-title { font-size: 13px; font-weight: bold; color: #7f8c8d; margin-bottom: 6px; margin-top: 10px; }
         .category-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 15px; }
         .btn-category { background: white; border: 2px solid #cbd5e1; border-radius: 8px; padding: 12px 0; font-size: 15px; font-weight: bold; color: #475569; cursor: pointer; text-align: center; }
         .btn-category.selected { background: #e0f2fe; border-color: #0284c7; color: #0369a1; box-shadow: 0 0 0 2px rgba(3,105,161,0.2); }
 
-        /* 🔢 電卓風入力表示・テンキーエリア */
+        /* 🔢 電卓風表示・テンキー */
         .calc-display { background: #1e293b; color: #38bdf8; font-size: 26px; font-weight: bold; text-align: right; padding: 12px; border-radius: 6px; margin-bottom: 10px; min-height: 55px; font-family: monospace; letter-spacing: 1px; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 15px; }
         .btn-calc { background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 16px 0; font-size: 18px; font-weight: bold; color: #1f2937; cursor: pointer; text-align: center; user-select: none; }
@@ -44,7 +40,7 @@
         .btn-calc.ok { grid-row: span 2; display: flex; align-items: center; justify-content: center; background: #ef4444; color: white; border-color: #dc2626; font-size: 20px; }
         .btn-calc.ok:active { background: #dc2626; }
 
-        /* 📋 履歴テーブル */
+        /* 📋 テーブル */
         table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 14px; }
         th, td { border: 1px solid #dee2e6; padding: 8px; text-align: center; }
         th { background-color: #f8f9fa; }
@@ -108,7 +104,7 @@
         <button class="btn-calc ok" onclick="pressAction('OK')">OK<br>確定</button>
 
         <button class="btn-calc" style="grid-column: span 2;" onclick="pressNum('0')">0</button>
-        <button class="btn-calc" onclick="pressNum('00')">00</button>
+        <button class="btn-calc action" style="font-size: 22px;" onclick="toggleMinus()">ー</button>
     </div>
 
     <h3 style="font-size: 15px; margin-bottom: 5px; margin-top: 15px;">登録データ一覧</h3>
@@ -207,17 +203,45 @@
             alert("先に上のカプセル単価（カテゴリー）を選択してください！");
             return;
         }
-        if (currentCountStr === "0") {
-            if (num === "0" || num === "00") return;
-            currentCountStr = num;
+
+        // マイナス符号を一時的に外して数字部分だけで処理
+        let isMinus = currentCountStr.startsWith('-');
+        let pureNumStr = isMinus ? currentCountStr.slice(1) : currentCountStr;
+
+        if (pureNumStr === "0") {
+            if (num === "0") return;
+            pureNumStr = num;
         } else {
-            currentCountStr += num;
+            pureNumStr += num;
         }
-        if (parseInt(currentCountStr, 10) > 50) {
-            currentCountStr = "50";
+
+        // 上限50個に制限
+        if (parseInt(pureNumStr, 10) > 50) {
+            pureNumStr = "50";
         }
+
+        // マイナスを戻す
+        currentCountStr = (isMinus ? '-' : '') + pureNumStr;
+
         updateDisplay();
         playBeep(1200, 0.03);
+    }
+
+    // マイナスの付け外し（符号反転）
+    function toggleMinus() {
+        if (selectedCategory === null) {
+            alert("先に上のカプセル単価（カテゴリー）を選択してください！");
+            return;
+        }
+        if (currentCountStr === "" || currentCountStr === "0") {
+            currentCountStr = "-0";
+        } else if (currentCountStr.startsWith('-')) {
+            currentCountStr = currentCountStr.slice(1);
+        } else {
+            currentCountStr = '-' + currentCountStr;
+        }
+        updateDisplay();
+        playBeep(900, 0.05);
     }
 
     function pressAction(action) {
@@ -225,10 +249,12 @@
             currentCountStr = "0";
             playBeep(600, 0.08);
         } else if (action === 'Del') {
-            if (currentCountStr.length > 1) {
-                currentCountStr = currentCountStr.slice(0, -1);
-            } else {
+            // マイナスだけの状態、または1文字だけの場合は0に戻す
+            if (currentCountStr === "-0" || currentCountStr === "-" || currentCountStr.length <= 1) {
                 currentCountStr = "0";
+            } else {
+                currentCountStr = currentCountStr.slice(0, -1);
+                if (currentCountStr === "-") currentCountStr = "-0";
             }
             playBeep(600, 0.05);
         } else if (action === 'OK') {
@@ -237,8 +263,8 @@
                 alert("カプセル単価を選択してください。");
                 return;
             }
-            if (isNaN(count) || count <= 0) {
-                alert("補充数を1以上で入力してください。");
+            if (isNaN(count) || count === 0) {
+                alert("補充数を1以上、またはマイナスの数で入力してください。");
                 return;
             }
 
