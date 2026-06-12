@@ -3,57 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>補充登録ツール（手入力版）</title>
+    <title>音声入力補充登録ツール</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { font-family: Arial, sans-serif; margin: 15px; background-color: #f5f5f5; color: #333; font-size: 14px; }
         .container { max-width: 650px; margin: 0 auto; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #2c3e50; font-size: 20px; margin-top: 5px; margin-bottom: 15px; }
+        h1 { text-align: center; color: #2980b9; font-size: 20px; margin-top: 5px; margin-bottom: 15px; }
         
-        /* 📱 スマホ用入力エリア */
+        /* 📱 スマホ画面に完全最適化した入力エリア */
         .meta-input-group { background: #fdfefe; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; margin-bottom: 15px; display: flex; flex-direction: column; }
+        
+        /* 📅 日付：右側・やや小さめ */
         .meta-row-date { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; font-size: 12px; width: 100%; }
         .meta-row-date label { font-weight: bold; color: #718096; margin-right: 5px; }
         .meta-row-date input { width: 130px; padding: 5px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; text-align: center; background-color: #f7fafc; }
+
+        /* 📍 登録地・👤 作業者：中央配置・同じ大きさ */
         .meta-row-center { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; font-size: 14px; width: 100%; }
         .meta-row-center:last-child { margin-bottom: 0; }
         .meta-row-center label { font-weight: bold; color: #4a5568; margin-right: 8px; width: 60px; text-align: right; }
         .meta-row-center input { width: 160px; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
 
-        /* 💾 保存・クリアボタン */
-        .save-group { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn-save { background-color: #f39c12; color: white; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 5px; flex: 1; cursor: pointer; text-align: center; }
-        .btn-clear { background-color: #7f8c8d; color: white; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 5px; flex: 1; cursor: pointer; text-align: center; }
-
-        /* 📁 カテゴリー選択 */
-        .section-title { font-size: 13px; font-weight: bold; color: #7f8c8d; margin-bottom: 6px; margin-top: 10px; }
-        .category-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 15px; }
-        .btn-category { background: white; border: 2px solid #cbd5e1; border-radius: 8px; padding: 12px 0; font-size: 15px; font-weight: bold; color: #475569; cursor: pointer; text-align: center; }
-        .btn-category.selected { background: #e0f2fe; border-color: #0284c7; color: #0369a1; box-shadow: 0 0 0 2px rgba(3,105,161,0.2); }
-
-        /* 🔢 電卓風表示・テンキー */
-        .calc-display { background: #1e293b; color: #38bdf8; font-size: 26px; font-weight: bold; text-align: right; padding: 12px; border-radius: 6px; margin-bottom: 10px; min-height: 55px; font-family: monospace; letter-spacing: 1px; }
-        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 15px; }
-        .btn-calc { background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 16px 0; font-size: 18px; font-weight: bold; color: #1f2937; cursor: pointer; text-align: center; user-select: none; }
-        .btn-calc:active { background: #f3f4f6; }
-        .btn-calc.action { color: #d97706; background: #fffbeb; border-color: #fde68a; }
-        .btn-calc.ok { grid-row: span 2; display: flex; align-items: center; justify-content: center; background: #ef4444; color: white; border-color: #dc2626; font-size: 20px; }
-        .btn-calc.ok:active { background: #dc2626; }
-
-        /* 📋 テーブル */
+        .status { padding: 10px; border-radius: 5px; text-align: center; margin-bottom: 15px; font-weight: bold; }
+        .waiting { background-color: #e2e3e5; color: #383d41; }
+        .listening { background-color: #d4edda; color: #155724; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        button { flex: 1; padding: 12px; font-size: 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; text-align: center; }
+        .btn-start { background-color: #28a745; color: white; }
+        .btn-stop { background-color: #dc3545; color: white; }
+        
+        .save-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-save { background-color: #f39c12; color: white; padding: 10px; font-size: 13px; }
+        .btn-clear { background-color: #7f8c8d; color: white; padding: 10px; font-size: 13px; }
+        .btn-csv { background-color: #007bff; color: white; width: 100%; margin-top: 20px; padding: 14px; font-size: 16px; }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 14px; }
         th, td { border: 1px solid #dee2e6; padding: 8px; text-align: center; }
         th { background-color: #f8f9fa; }
-        .log-box { max-height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; background: #fafafa; border-radius: 5px; margin-top: 5px; }
-        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; }
-        .btn-csv { background-color: #007bff; color: white; width: 100%; margin-top: 15px; padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; }
-        .btn-csv:disabled { background-color: #cccccc; cursor: not-allowed; }
+        .log-box { max-height: 250px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; background: #fafafa; border-radius: 5px; margin-top: 5px; }
+        
+        .guide-box { background-color: #e8f4fd; padding: 12px; border-radius: 5px; margin-bottom: 15px; font-size: 13px; border-left: 5px solid #007bff; line-height: 1.5; }
+        .guide-title { font-weight: bold; color: #007bff; margin-bottom: 5px; display: flex; align-items: center; gap: 4px; }
+        
+        .btn-delete { background-color: #e74c3c; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: normal; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>補充登録ツール（手入力版）</h1>
+    <h1>音声入力補充登録ツール</h1>
 
     <div class="meta-input-group">
         <div class="meta-row-date">
@@ -70,44 +71,30 @@
         </div>
     </div>
 
+    <div class="guide-box">
+        <div class="guide-title">🎤 喋り方のコツ</div>
+        普通に「<b>カテゴリー（カプセル単価）</b>」と言ったあと、<b>一拍（1秒ほど）あけて</b>「<b>追加（補充数）</b>」とハキハキ伝えると正確に読み取れます。<br>
+        <span style="color: #666; font-size: 11px;">例：「カテゴリー 500 ……（あける）…… 追加 にー」</span>
+    </div>
+    
+    <div id="status" class="status waiting">停止中（ボタンを押して開始）</div>
+    
+    <div class="btn-group">
+        <button id="startBtn" class="btn-start">音声認識 開始</button>
+        <button id="stopBtn" class="btn-stop" disabled>音声認識 停止</button>
+    </div>
+
     <div class="save-group">
         <button id="saveBtn" class="btn-save">💾 データを手動保存</button>
         <button id="clearBtn" class="btn-clear">🗑️ 画面をクリア（新規作成）</button>
     </div>
 
-    <div class="section-title">① カプセル単価（カテゴリー）を選択</div>
-    <div class="category-grid">
-        <button class="btn-category" onclick="selectCategory(100)">100</button>
-        <button class="btn-category" onclick="selectCategory(200)">200</button>
-        <button class="btn-category" onclick="selectCategory(300)">300</button>
-        <button class="btn-category" onclick="selectCategory(400)">400</button>
-        <button class="btn-category" onclick="selectCategory(500)">500</button>
+    <div style="background: #fff; padding: 8px; border: 1px dashed #bbb; border-radius: 5px; margin-bottom: 10px;">
+        <div><strong>今聞き取った言葉:</strong> <span id="liveText" style="color: blue; font-size: 16px; font-weight: bold;">---</span></div>
+        <div style="font-size: 11px; color: #777; margin-top: 4px;">状態: <span id="debugText" style="font-weight: bold;">待ち受け中</span></div>
     </div>
 
-    <div class="section-title">② 補充数を入力して「OK」で確定</div>
-    <div id="calcDisplay" class="calc-display">単価を選んでください</div>
-
-    <div class="calc-grid">
-        <button class="btn-calc" onclick="pressNum('7')">7</button>
-        <button class="btn-calc" onclick="pressNum('8')">8</button>
-        <button class="btn-calc" onclick="pressNum('9')">9</button>
-        <button class="btn-calc action" onclick="pressAction('AC')">AC</button>
-
-        <button class="btn-calc" onclick="pressNum('4')">4</button>
-        <button class="btn-calc" onclick="pressNum('5')">5</button>
-        <button class="btn-calc" onclick="pressNum('6')">6</button>
-        <button class="btn-calc action" onclick="pressAction('Del')">Del</button>
-
-        <button class="btn-calc" onclick="pressNum('1')">1</button>
-        <button class="btn-calc" onclick="pressNum('2')">2</button>
-        <button class="btn-calc" onclick="pressNum('3')">3</button>
-        <button class="btn-calc ok" onclick="pressAction('OK')">OK<br>確定</button>
-
-        <button class="btn-calc" style="grid-column: span 2;" onclick="pressNum('0')">0</button>
-        <button class="btn-calc action" style="font-size: 22px;" onclick="toggleMinus()">ー</button>
-    </div>
-
-    <h3 style="font-size: 15px; margin-bottom: 5px; margin-top: 15px;">登録データ一覧</h3>
+    <h3 style="font-size: 15px; margin-bottom: 5px; margin-top: 15px;">読み取りデータ一覧</h3>
     <div class="log-box">
         <table>
             <thead>
@@ -125,15 +112,28 @@
 </div>
 
 <script>
-    let dataList = [];
-    let selectedCategory = null;
-    let currentCountStr = "";
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("お使いのブラウザは音声認識に対応していません。Google ChromeやSafariでお試しください。");
+    }
 
-    const calcDisplay = document.getElementById('calcDisplay');
-    const dataTable = document.getElementById('dataTable');
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ja-JP';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    let isRunning = false;
+    let dataList = [];
+
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
     const csvBtn = document.getElementById('csvBtn');
     const saveBtn = document.getElementById('saveBtn');
     const clearBtn = document.getElementById('clearBtn');
+    const statusDiv = document.getElementById('status');
+    const liveText = document.getElementById('liveText');
+    const debugText = document.getElementById('debugText');
+    const dataTable = document.getElementById('dataTable');
 
     window.addEventListener('DOMContentLoaded', () => {
         const today = new Date();
@@ -142,141 +142,114 @@
         const dd = String(today.getDate()).padStart(2, '0');
         document.getElementById('inputDate').value = `${yyyy}-${mm}-${dd}`;
 
-        const savedData = localStorage.getItem('hojuu_hand_data');
-        const savedLocation = localStorage.getItem('hojuu_hand_location');
-        const savedWorker = localStorage.getItem('hojuu_hand_worker');
-        const savedDate = localStorage.getItem('hojuu_hand_date');
+        const savedData = localStorage.getItem('hojuu_saved_data');
+        const savedLocation = localStorage.getItem('hojuu_saved_location');
+        const savedWorker = localStorage.getItem('hojuu_saved_worker');
+        const savedDate = localStorage.getItem('hojuu_saved_date');
 
         if (savedData) {
             dataList = JSON.parse(savedData);
             renderTable();
+            debugText.innerText = "⚠️ 前回のデータを自動復元しました！";
         }
         if (savedLocation) document.getElementById('inputLocation').value = savedLocation;
         if (savedWorker) document.getElementById('inputWorker').value = savedWorker;
         if (savedDate) document.getElementById('inputDate').value = savedDate;
-
-        updateDisplay();
     });
 
     function saveToStorage(isManual = false) {
-        localStorage.setItem('hojuu_hand_data', JSON.stringify(dataList));
-        localStorage.setItem('hojuu_hand_location', document.getElementById('inputLocation').value);
-        localStorage.setItem('hojuu_hand_worker', document.getElementById('inputWorker').value);
-        localStorage.setItem('hojuu_hand_date', document.getElementById('inputDate').value);
+        localStorage.setItem('hojuu_saved_data', JSON.stringify(dataList));
+        localStorage.setItem('hojuu_saved_location', document.getElementById('inputLocation').value);
+        localStorage.setItem('hojuu_saved_worker', document.getElementById('inputWorker').value);
+        localStorage.setItem('hojuu_saved_date', document.getElementById('inputDate').value);
         
         if (isManual) {
-            playBeep(1000, 0.1);
+            playSuccessBeep();
             alert("現在のデータを端末内に保存しました！");
         }
     }
 
-    saveBtn.addEventListener('click', () => saveToStorage(true));
+    saveBtn.addEventListener('click', () => {
+        saveToStorage(true);
+    });
 
     clearBtn.addEventListener('click', () => {
-        if (confirm("画面のデータを一括クリアします。よろしいですか？")) {
+        if (confirm("画面のデータを一括クリアします。よろしいですか？（端末内の保存データも消去されます）")) {
             dataList = [];
             renderTable();
-            localStorage.removeItem('hojuu_hand_data');
-            localStorage.removeItem('hojuu_hand_location');
-            localStorage.removeItem('hojuu_hand_worker');
-            localStorage.removeItem('hojuu_hand_date');
-            selectedCategory = null;
-            currentCountStr = "";
-            document.querySelectorAll('.btn-category').forEach(b => b.classList.remove('selected'));
-            updateDisplay();
+            localStorage.removeItem('hojuu_saved_data');
+            localStorage.removeItem('hojuu_saved_location');
+            localStorage.removeItem('hojuu_saved_worker');
+            localStorage.removeItem('hojuu_saved_date');
+            debugText.innerText = "データを完全にクリアしました。";
         }
     });
 
-    function selectCategory(num) {
-        selectedCategory = num;
-        document.querySelectorAll('.btn-category').forEach(btn => {
-            btn.classList.remove('selected');
-            if(parseInt(btn.innerText, 10) === num) btn.classList.add('selected');
-        });
-        if(currentCountStr === "") currentCountStr = "0";
-        updateDisplay();
-        playBeep(800, 0.05);
+    function playSuccessBeep() {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(1000, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.1);
     }
 
-    function pressNum(num) {
-        if (selectedCategory === null) {
-            alert("先に上のカプセル単価（カテゴリー）を選択してください！");
-            return;
-        }
+    function playErrorBeep() {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(150, audioCtx.currentTime);
+        gain1.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start();
+        osc1.stop(audioCtx.currentTime + 0.15);
 
-        let isMinus = currentCountStr.startsWith('-');
-        let pureNumStr = isMinus ? currentCountStr.slice(1) : currentCountStr;
-
-        if (pureNumStr === "0") {
-            if (num === "0") return;
-            pureNumStr = num;
-        } else {
-            pureNumStr += num;
-        }
-
-        // ⚠️【変更点】上限「50」の制限を完全解除しました！何桁でも入力可能です
-        currentCountStr = (isMinus ? '-' : '') + pureNumStr;
-
-        updateDisplay();
-        playBeep(1200, 0.03);
+        setTimeout(() => {
+            const osc2 = audioCtx.createOscillator();
+            const gain2 = audioCtx.createGain();
+            osc2.type = 'sawtooth';
+            osc2.frequency.setValueAtTime(150, audioCtx.currentTime);
+            gain2.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            osc2.connect(gain2);
+            gain2.connect(audioCtx.destination);
+            osc2.start();
+            osc2.stop(audioCtx.currentTime + 0.15);
+        }, 100);
     }
 
-    function toggleMinus() {
-        if (selectedCategory === null) {
-            alert("先に上のカプセル単価（カテゴリー）を選択してください！");
-            return;
-        }
-        if (currentCountStr === "" || currentCountStr === "0") {
-            currentCountStr = "-0";
-        } else if (currentCountStr.startsWith('-')) {
-            currentCountStr = currentCountStr.slice(1);
-        } else {
-            currentCountStr = '-' + currentCountStr;
-        }
-        updateDisplay();
-        playBeep(900, 0.05);
-    }
+    const categoryMap = {
+        '百': 100, 'ひゃく': 100, '100': 100,
+        '二百': 200, 'にひゃく': 200, '200': 200,
+        '三百': 300, 'さんびゃく': 300, '300': 300,
+        '四百': 400, 'よんひゃく': 400, '400': 400,
+        '五百': 500, 'ごひゃく': 500, '500': 500
+    };
 
-    function pressAction(action) {
-        if (action === 'AC') {
-            currentCountStr = "0";
-            playBeep(600, 0.08);
-        } else if (action === 'Del') {
-            if (currentCountStr === "-0" || currentCountStr === "-" || currentCountStr.length <= 1) {
-                currentCountStr = "0";
-            } else {
-                currentCountStr = currentCountStr.slice(0, -1);
-                if (currentCountStr === "-") currentCountStr = "-0";
-            }
-            playBeep(600, 0.05);
-        } else if (action === 'OK') {
-            const count = parseInt(currentCountStr, 10);
-            if (selectedCategory === null) {
-                alert("カプセル単価を選択してください。");
-                return;
-            }
-            if (isNaN(count) || count === 0) {
-                alert("補充数を入力してください。");
-                return;
-            }
+    function parseCount(str) {
+        if (!str) return null;
+        str = str.trim();
 
-            dataList.push({ category: selectedCategory, count: count });
-            renderTable();
-            saveToStorage();
-            
-            currentCountStr = "0";
-            playBeep(1000, 0.15);
-        }
-        updateDisplay();
-    }
+        const directConvert = {
+            'い':1, 'いち':1, 'に':2, 'にー':2, 'さん':3, 'し':4, 'よん':4, 'ご':5, 'ろく':6, 'しち':7, 'なな':7, 'はち':8, 'きゅう':9, 'く':9, 'じゅう':10,
+            '一':1, '二':2, '三':3, '四':4, '五':5, '六':6, '七':7, '八':8, '九':9, '十':10
+        };
+        if (directConvert[str]) return directConvert[str];
 
-    function updateDisplay() {
-        if (selectedCategory === null) {
-            calcDisplay.innerHTML = `<span style="font-size:14px; color:#64748b;">単価を選んでください</span>`;
-        } else {
-            const displayNum = currentCountStr === "" ? "0" : currentCountStr;
-            calcDisplay.innerHTML = `<span style="font-size:13px; color:#94a3b8; float:left;">単価:${selectedCategory} ➔ </span> ${displayNum} <span style="font-size:16px; color:#64748b;">個</span>`;
-        }
+        str = str.replace(/二十/g, '20').replace(/三十/g, '30').replace(/四十/g, '40').replace(/五十/g, '50').replace(/十/g, '10');
+        const units = {'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9};
+        for(let k in units) { str = str.replace(new RegExp(k, 'g'), units[k]); }
+        
+        if (str.match(/^[2345]0[123456789]$/)) { str = str.charAt(0) + str.charAt(2); } 
+        else if (str.match(/^10[123456789]$/)) { str = '1' + str.charAt(2); }
+
+        let num = parseInt(str.replace(/[^0-9]/g, ''), 10);
+        return isNaN(num) ? null : num;
     }
 
     function renderTable() {
@@ -296,33 +269,83 @@
         dataList.splice(index, 1);
         renderTable();
         saveToStorage();
+        debugText.innerText = "データを1件削除しました。";
     };
 
-    function playBeep(freq, duration) {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + duration);
-        } catch(e) {}
-    }
+    recognition.onresult = (event) => {
+        let resultText = event.results[event.results.length - 1][0].transcript.trim();
+        liveText.innerText = resultText;
+
+        if (!resultText.includes('カテゴリー') && !resultText.includes('カテゴリ') && !resultText.includes('追加') && !resultText.includes('ついか')) {
+            return; 
+        }
+
+        resultText = resultText.replace(/カテゴリー|カテゴリ/g, 'カテゴリー');
+        resultText = resultText.replace(/追加|ついか|ツイカ/g, '追加');
+
+        let category = null;
+        let count = null;
+
+        if (resultText.includes('カテゴリー')) {
+            let afterCategory = "";
+            if (resultText.includes('追加')) {
+                afterCategory = resultText.split('カテゴリー')[1].split('追加')[0].trim();
+            } else {
+                afterCategory = resultText.split('カテゴリー')[1].trim();
+            }
+            category = categoryMap[afterCategory] || parseInt(afterCategory.replace(/[^0-9]/g, ''), 10);
+        }
+
+        if (resultText.includes('追加')) {
+            let afterCount = resultText.split('追加')[1].trim();
+            count = parseCount(afterCount);
+        }
+
+        debugText.innerText = `判定中 -> カテゴリー: ${category} / 追加数: ${count}`;
+
+        if ([100, 200, 300, 400, 500].includes(category) && count >= 1 && count <= 50) {
+            dataList.push({ category, count });
+            renderTable();
+            saveToStorage();
+            playSuccessBeep();
+            debugText.innerText = `自動保存済 -> 追加（${category} / ${count}）`;
+        } else {
+            playErrorBeep();
+            debugText.innerText = `エラー -> 条件に合いません（カテゴリー:${category}、追加数:${count}）`;
+        }
+    };
+
+    recognition.onend = () => { if (isRunning) recognition.start(); };
+
+    startBtn.addEventListener('click', () => {
+        isRunning = true;
+        recognition.start();
+        statusDiv.innerText = "音声聞き取り中...";
+        statusDiv.className = "status listening";
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+    });
+
+    stopBtn.addEventListener('click', () => {
+        isRunning = false;
+        recognition.stop();
+        statusDiv.innerText = "停止中（ボタンを押して開始）";
+        statusDiv.className = "status waiting";
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        saveToStorage();
+    });
 
     csvBtn.addEventListener('click', () => {
         if (dataList.length === 0) return;
+        
         const locationStr = document.getElementById('inputLocation').value.trim() || "未指定";
         const workerStr = document.getElementById('inputWorker').value.trim() || "";
         const rawDate = document.getElementById('inputDate').value;
         const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
-        const nameSuffix = workerStr ? `_${workerStr}` : "";
         
-        // 📝【変更点】ファイル名を shudou.html にあわせて綺麗に整理しました
-        const fileName = `${dateStr}_${locationStr}${nameSuffix}補充伝票(手入力).csv`;
+        const nameSuffix = workerStr ? `_${workerStr}` : "";
+        const fileName = `${dateStr}_${locationStr}${nameSuffix}補充伝票.csv`;
 
         let csvContent = "カテゴリー,追加数\r\n";
         dataList.forEach(item => { csvContent += `${item.category},${item.count}\r\n`; });
@@ -330,6 +353,7 @@
         const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
+        
         link.setAttribute("href", url);
         link.setAttribute("download", fileName);
         document.body.appendChild(link);
