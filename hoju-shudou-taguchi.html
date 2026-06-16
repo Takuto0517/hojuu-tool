@@ -117,6 +117,7 @@
         <button id="clearBtn" class="btn-clear">🗑️ 画面をクリア（新規作成）</button>
     </div>
 
+    <!-- 🔍 表示項目フィルター機能 -->
     <div class="filter-card">
         <div class="filter-toggle" onclick="toggleFilterOptions()">
             <span>🔍 表示するカテゴリーを選択（クリックで展開）</span>
@@ -546,7 +547,10 @@
         const rawDate = document.getElementById('inputDate').value;
         const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
         
-        const fileName = `${dateStr}_${locationStr}_補充伝票(手入力).csv`;
+        const date6Digit = dateStr.length === 8 ? dateStr.slice(2) : dateStr;
+        const workerName = "田口（000025）";
+        
+        const fileName = `${date6Digit}【補充伝票_${locationStr}_${workerName}】.csv`;
         const sortedList = getSortedDataList();
 
         let csvContent = "";
@@ -554,8 +558,11 @@
             const itemInfo = categoryMaster.find(c => c.id === item.categoryId);
             const csvName = itemInfo ? itemInfo.csvName : item.categoryName;
             
-            // 🌟 A列を「日付(8桁)」に戻し、C列を一律で「000025」に固定しました
-            csvContent += `${dateStr},${customerCode},000025,${csvName},${item.count}\r\n`;
+            // 🌟 Excelでの「頭ゼロ見切れ」を防ぐため、="文字列" 形式で出力するように修正
+            const formatLocationCode = `="${customerCode}"`;
+            const formatWorkerCode = `="000025"`;
+            
+            csvContent += `${dateStr},${formatLocationCode},${formatWorkerCode},${csvName},${item.count}\r\n`;
         });
         
         const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
