@@ -26,17 +26,21 @@
         .btn-save { background-color: #f59e0b; color: white; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 6px; flex: 1; cursor: pointer; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-clear { background-color: #64748b; color: white; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 6px; flex: 1; cursor: pointer; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        /* 🔍 表示項目フィルター機能 */
+        /* 🔍 表示項目フィルター機能（グループ分け対応） */
         .filter-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; padding: 8px 12px; }
         .filter-toggle { font-size: 13px; font-weight: bold; color: #2563eb; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
-        .filter-options { display: none; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; }
-        @media (max-width: 480px) { .filter-options { grid-template-columns: repeat(2, 1fr); } }
-        .filter-item { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: bold; color: #475569; cursor: pointer; }
-        .filter-item input { transform: scale(1.05); cursor: pointer; }
+        .filter-options { display: none; flex-direction: column; gap: 10px; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; }
+        .filter-group-box { background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; }
+        .filter-group-label { font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 6px; padding-bottom: 2px; border-bottom: 1px solid #f1f5f9; }
+        .filter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+        @media (max-width: 480px) { .filter-grid { grid-template-columns: repeat(2, 1fr); } }
+        .filter-item { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: bold; color: #475569; cursor: pointer; padding: 2px; }
+        .filter-item input { transform: scale(1.1); cursor: pointer; }
 
         /* 📁 カテゴリー選択 */
         .section-title { font-size: 14px; font-weight: bold; color: #1e3a8a; margin: 15px 0 8px 0; padding-left: 6px; border-left: 4px solid #2563eb; }
         .group-container { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+        .group-container.hidden-group { display: none !important; }
         .group-label { font-size: 12px; font-weight: bold; color: #64748b; margin-bottom: 6px; }
         .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
         @media (max-width: 480px) { .category-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -64,7 +68,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; background: white; }
         th, td { border: 1px solid #cbd5e1; padding: 8px 4px; text-align: center; }
         th { background-color: #475569; color: white; font-size: 12px; }
-        .log-box { max-height: 220px; overflow-y: auto; border: 2px solid #cbd5e1; padding: 4px; background: #fafafa; border-radius: 8px; margin-top: 5px; }
+        .log-box { max-height: 400px; overflow-y: auto; border: 2px solid #cbd5e1; padding: 4px; background: #fafafa; border-radius: 8px; margin-top: 5px; }
         .btn-delete { background-color: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
         
         .btn-csv { background-color: #2563eb; color: white; width: 100%; margin-top: 15px; padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.2); }
@@ -104,7 +108,7 @@
         </div>
         <div class="meta-row-center">
             <label for="inputWorker">👤 作業者:</label>
-            <input type="text" id="inputWorker" value="田口" disabled>
+            <input type="text" id="inputWorker" value="田口（000025）" disabled>
         </div>
     </div>
 
@@ -118,28 +122,27 @@
             <span>🔍 表示するカテゴリーを選択（クリックで展開）</span>
             <span id="filterArrow">▼</span>
         </div>
-        <div class="filter-options" id="filterOptions">
-            </div>
+        <div class="filter-options" id="filterOptions"></div>
     </div>
 
     <div class="section-title">① カテゴリーを選択</div>
     
-    <div class="group-container grp-carddas">
+    <div id="container-carddas" class="group-container grp-carddas">
         <div class="group-label">ーー カードダス ーー</div>
         <div class="category-grid" id="grid-carddas"></div>
     </div>
     
-    <div class="group-container grp-capsule">
+    <div id="container-capsule" class="group-container grp-capsule">
         <div class="group-label">ーー カプセル ーー</div>
         <div class="category-grid" id="grid-capsule"></div>
     </div>
 
-    <div class="group-container grp-vag">
+    <div id="container-vag" class="group-container grp-vag">
         <div class="group-label">ーー VAG ーー</div>
         <div class="category-grid" id="grid-vag"></div>
     </div>
 
-    <div class="group-container grp-cardgame">
+    <div id="container-cardgame" class="group-container grp-cardgame">
         <div class="group-label">ーー カードゲーム ーー</div>
         <div class="category-grid" id="grid-cardgame"></div>
     </div>
@@ -227,6 +230,13 @@
         { id: "g3", name: "フレンダピック", csvName: "ﾍﾟﾆｲ/ﾎﾟｹﾓﾝﾌﾚﾝﾀﾞ", group: "cardgame" }
     ];
 
+    const groupNames = {
+        carddas: "ーー カードダス ーー",
+        capsule: "ーー カプセル ーー",
+        vag: "ーー VAG ーー",
+        cardgame: "ーー カードゲーム ーー"
+    };
+
     let dataList = [];
     let selectedCategoryId = null;
     let currentCountStr = "";
@@ -250,9 +260,7 @@
         const savedDate = localStorage.getItem('hojuu_hand_date');
         const savedFilter = localStorage.getItem('hojuu_visible_categories');
 
-        if (savedData) {
-            dataList = JSON.parse(savedData);
-        }
+        if (savedData) dataList = JSON.parse(savedData);
         if (savedLocation) document.getElementById('inputLocation').value = savedLocation;
         if (savedDate) document.getElementById('inputDate').value = savedDate;
 
@@ -264,6 +272,7 @@
 
         renderCategoryButtons();
         renderFilterOptions();
+        checkGroupVisibility();
         renderTable();
         updateDisplay();
     });
@@ -286,14 +295,27 @@
     function renderFilterOptions() {
         const container = document.getElementById('filterOptions');
         container.innerHTML = "";
-        categoryMaster.forEach(c => {
-            const isChecked = visibleCategories[c.id] ? "checked" : "";
-            const html = `
-                <label class="filter-item">
-                    <input type="checkbox" id="filter-chk-${c.id}" ${isChecked} onchange="onToggleCategoryFilter('${c.id}')">
-                    <span>${c.name}</span>
-                </label>
+        const groups = ["carddas", "capsule", "vag", "cardgame"];
+        
+        groups.forEach(grp => {
+            const grpItems = categoryMaster.filter(c => c.group === grp);
+            if(grpItems.length === 0) return;
+
+            let html = `
+                <div class="filter-group-box">
+                    <div class="filter-group-label">${groupNames[grp]}</div>
+                    <div class="filter-grid">
             `;
+            grpItems.forEach(c => {
+                const isChecked = visibleCategories[c.id] ? "checked" : "";
+                html += `
+                    <label class="filter-item">
+                        <input type="checkbox" id="filter-chk-${c.id}" ${isChecked} onchange="onToggleCategoryFilter('${c.id}')">
+                        <span>${c.name}</span>
+                    </label>
+                `;
+            });
+            html += `</div></div>`;
             container.insertAdjacentHTML('beforeend', html);
         });
     }
@@ -301,11 +323,11 @@
     function toggleFilterOptions() {
         const opts = document.getElementById('filterOptions');
         const arrow = document.getElementById('filterArrow');
-        if (opts.style.display === 'grid') {
+        if (opts.style.display === 'flex') {
             opts.style.display = 'none';
             arrow.innerText = '▼';
         } else {
-            opts.style.display = 'grid';
+            opts.style.display = 'flex';
             arrow.innerText = '▲';
         }
     }
@@ -326,6 +348,21 @@
                 updateDisplay();
             }
         }
+        checkGroupVisibility();
+    }
+
+    function checkGroupVisibility() {
+        const groups = ["carddas", "capsule", "vag", "cardgame"];
+        groups.forEach(grp => {
+            const grpItems = categoryMaster.filter(c => c.group === grp);
+            const hasVisibleItem = grpItems.some(c => visibleCategories[c.id] === true);
+            const container = document.getElementById(`container-${grp}`);
+            if (hasVisibleItem) {
+                container.classList.remove('hidden-group');
+            } else {
+                container.classList.add('hidden-group');
+            }
+        });
     }
 
     function onChangeLocation() {
@@ -336,7 +373,6 @@
         localStorage.setItem('hojuu_hand_data', JSON.stringify(dataList));
         localStorage.setItem('hojuu_hand_location', document.getElementById('inputLocation').value);
         localStorage.setItem('hojuu_hand_date', document.getElementById('inputDate').value);
-        
         if (isManual) {
             playBeep(1000, 0.1);
             alert("現在のデータを端末内に保存しました！");
@@ -361,7 +397,6 @@
         selectedCategoryId = id;
         document.querySelectorAll('.btn-category').forEach(btn => btn.classList.remove('selected'));
         document.getElementById(`btn-cat-${id}`).classList.add('selected');
-        
         if(currentCountStr === "") currentCountStr = "0";
         updateDisplay();
         playBeep(800, 0.05);
@@ -426,18 +461,14 @@
             }
 
             const itemInfo = categoryMaster.find(c => c.id === selectedCategoryId);
-            
-            // タイムスタンプを追加して識別しやすくする
             dataList.push({ 
                 categoryId: selectedCategoryId, 
                 categoryName: itemInfo.name, 
                 count: count,
                 timestamp: Date.now() 
             });
-            
             renderTable();
             saveToStorage();
-            
             currentCountStr = "0";
             playBeep(1000, 0.15);
         }
@@ -454,41 +485,26 @@
         }
     }
 
-    // 🔄 カテゴリーの登場頻度をベースにリストをソートする関数
     function getSortedDataList() {
-        // 各カテゴリーの出現回数を集計
         const counts = {};
-        dataList.forEach(item => {
-            counts[item.categoryId] = (counts[item.categoryId] || 0) + 1;
-        });
-
-        // マスタ配列のインデックスを取得（同じ出現回数の時の第二ソート用キー）
+        dataList.forEach(item => { counts[item.categoryId] = (counts[item.categoryId] || 0) + 1; });
         const masterOrder = {};
         categoryMaster.forEach((c, idx) => { masterOrder[c.id] = idx; });
 
-        // ディープコピーを作成してソート
         return [...dataList].sort((a, b) => {
             const countA = counts[a.categoryId] || 0;
             const countB = counts[b.categoryId] || 0;
-
-            if (countB !== countA) {
-                return countB - countA; // 🌟 登場回数が多い順
-            }
-            // 回数が同じならマスターデータの並び順にまとめる
+            if (countB !== countA) return countB - countA;
             return masterOrder[a.categoryId] - masterOrder[b.categoryId];
         });
     }
 
     function renderTable() {
         dataTable.innerHTML = "";
-        
-        // ソート済みのデータを取得
         const sortedList = getSortedDataList();
 
         sortedList.forEach((item) => {
-            // 元のdataListにおけるインデックスを探す（削除ボタン用）
             const originalIndex = dataList.findIndex(orig => orig.timestamp === item.timestamp);
-            
             const row = `<tr>
                 <td style="text-align:left; font-weight:bold; padding-left:8px;">${item.categoryName}</td>
                 <td style="font-weight:bold;">${item.count}</td>
@@ -531,8 +547,6 @@
         const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
         
         const fileName = `${dateStr}_${locationStr}_補充伝票(手入力).csv`;
-
-        // 🌟 CSV出力用データも同様に「登場回数が多いカテゴリー順」にソート
         const sortedList = getSortedDataList();
 
         let csvContent = "";
@@ -540,7 +554,8 @@
             const itemInfo = categoryMaster.find(c => c.id === item.categoryId);
             const csvName = itemInfo ? itemInfo.csvName : item.categoryName;
             
-            csvContent += `${dateStr},${customerCode},000049,${csvName},${item.count}\r\n`;
+            // 🌟 A列を「日付(8桁)」に戻し、C列を一律で「000025」に固定しました
+            csvContent += `${dateStr},${customerCode},000025,${csvName},${item.count}\r\n`;
         });
         
         const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
