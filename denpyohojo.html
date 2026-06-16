@@ -10,16 +10,21 @@
         .container { max-width: 650px; margin: 0 auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         h1 { text-align: center; font-size: 19px; color: #0f172a; margin: 5px 0 15px 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; }
         
-        /* 🏷️ 現在の入力部門ヘッダー */
-        .current-dept-card { background: #334155; color: white; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
-        .current-dept-title { font-size: 13px; opacity: 0.8; font-weight: bold; }
-        .current-dept-name { font-size: 24px; font-weight: bold; margin-top: 2px; letter-spacing: 1px; }
+        /* 🏷️ 上部ステップボタンのスタイル */
+        .step-btn { padding: 8px 2px; font-size: 14px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .step-btn.btn-empty { background: #e2e8f0; color: #64748b; } 
+        .step-btn.btn-filled { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; } 
+        .step-btn.btn-active { background: #2563eb; color: white; box-shadow: 0 0 0 2px #93c5fd; } 
 
-        /* ⚙️ 手数料設定 */
-        .config-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; }
-        .config-title { font-weight: bold; color: #475569; font-size: 13px; }
+        /* 🏷️ 現在の入力部門ヘッダー */
+        .current-dept-card { background: #334155; color: white; padding: 14px; border-radius: 8px; text-align: center; margin-bottom: 15px; }
+        .current-dept-name { font-size: 24px; font-weight: bold; letter-spacing: 0.5px; }
+
+        /* ⚙️ 持帰金率設定 */
+        .config-card { background: #fffbeb; border: 2px solid #fef3c7; border-radius: 8px; padding: 12px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; }
+        .config-title { font-weight: bold; color: #b45309; font-size: 17px; }
         .fee-input-group { display: flex; align-items: center; gap: 5px; }
-        .fee-input { width: 75px; height: 36px; font-size: 16px; font-weight: bold; text-align: center; border: 2px solid #cbd5e1; border-radius: 6px; }
+        .fee-input { width: 80px; height: 38px; font-size: 18px; font-weight: bold; text-align: center; border: 2px solid #d97706; border-radius: 6px; }
 
         /* 🔍 金種フィルターセクション */
         .filter-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; padding: 8px 12px; }
@@ -28,10 +33,9 @@
         @media (max-width: 480px) { .filter-options { grid-template-columns: repeat(3, 1fr); } }
         .filter-item { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: bold; color: #475569; cursor: pointer; }
         .filter-item input { transform: scale(1.1); cursor: pointer; }
-
+        
         /* 🔢 金種入力テーブル */
-        .section-title { font-size: 14px; font-weight: bold; color: #1e3a8a; margin: 15px 0 8px 0; padding-left: 6px; border-left: 4px solid #2563eb; }
-        .money-table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 15px; }
+        .money-table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 15px; margin-top: 5px; }
         .money-table th { background: #475569; color: white; padding: 8px; font-size: 12px; }
         .money-table td { border: 1px solid #e2e8f0; padding: 8px 4px; vertical-align: middle; }
         .money-table tr.hidden-denom { display: none !important; }
@@ -46,13 +50,11 @@
         .amount-disp { font-size: 14px; font-weight: bold; color: #0f172a; display: block; }
         .cum-sheets-disp { font-size: 11px; color: #64748b; font-weight: bold; display: block; margin-top: 2px; }
 
-        /* 🚀 ボタン */
+        /* 🚀 ボタン基本スタイル */
         .btn-block { width: 100%; padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; text-align: center; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.08); }
-        .btn-next { background: #2563eb; color: white; }
-        .btn-next:active { background: #1d4ed8; }
 
         /* 📋 集計エリア */
-        .summary-box { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 15px; margin-top: 20px; }
+        .summary-box { background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 12px; padding: 15px; margin-top: 25px; }
         .summary-title { text-align: center; font-size: 18px; font-weight: bold; color: #0f172a; margin-top: 0; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 2px solid #cbd5e1; }
         
         .report-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px; background: white; }
@@ -61,6 +63,10 @@
         .report-table td.text-left { text-align: center; font-weight: bold; background: #f8fafc; font-size: 14px; }
         .row-total { background: #f0fdf4; font-weight: bold; }
         .row-total td { color: #166534; font-weight: bold; }
+
+        /* ⚙️ 修正ボタン */
+        .btn-edit { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; border-radius: 4px; padding: 4px 8px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        .btn-edit:hover { background: #bae6fd; }
 
         .text-center { text-align: center !important; }
         .text-bold { font-weight: bold; }
@@ -71,16 +77,24 @@
 <div class="container">
     <h1>売上精算書集計補助</h1>
 
+    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 15px;">
+        <button id="stepNav-0" onclick="jumpToDept(0)" class="step-btn btn-empty">①</button>
+        <button id="stepNav-1" onclick="jumpToDept(1)" class="step-btn btn-empty">②</button>
+        <button id="stepNav-2" onclick="jumpToDept(2)" class="step-btn btn-empty">③</button>
+        <button id="stepNav-3" onclick="jumpToDept(3)" class="step-btn btn-empty">④</button>
+        <button id="stepNav-4" onclick="jumpToDept(4)" class="step-btn btn-empty">⑤</button>
+        <button id="stepNav-5" onclick="jumpToDept(5)" class="step-btn btn-empty">⑥</button>
+    </div>
+
     <div class="current-dept-card">
-        <div class="current-dept-title" id="currentStepLabel">ステップ 1 / 6</div>
-        <div class="current-dept-name" id="currentDeptName">カテゴリー項目 【 ① 】</div>
+        <div class="current-dept-name" id="currentDeptName">現在入力中の項目：①</div>
     </div>
 
     <div class="config-card">
-        <div class="config-title">⚙️ この項目の持ち帰り金比率（％）</div>
+        <div class="config-title">⚙️ 持帰金率</div>
         <div class="fee-input-group">
             <input type="text" inputmode="decimal" id="feeRate" class="fee-input" value="75" oninput="onInputFeeRate()" onclick="this.select()">
-            <span style="font-weight: bold; color: #475569;">%</span>
+            <span style="font-weight: bold; color: #b45309; font-size: 18px;">%</span>
         </div>
     </div>
 
@@ -89,41 +103,41 @@
             <span>🔍 表示する金種を選択（クリックで展開）</span>
             <span id="filterArrow">▼</span>
         </div>
-        <div class="filter-options" id="filterOptions">
-            </div>
+        <div class="filter-options" id="filterOptions"></div>
     </div>
-
-    <div class="section-title" id="inputTableTitle">【 ① 】の枚数を入力してください</div>
+    
     <table class="money-table">
         <thead>
             <tr>
                 <th style="width: 25%;">金種</th>
                 <th style="width: 35%;">枚数入力</th>
-                <th style="width: 40%;">現在の金額 / (合算累計)</th>
+                <th style="width: 40%;">現在の金額 / (累計)</th>
             </tr>
         </thead>
-        <tbody id="denomTable">
-            </tbody>
+        <tbody id="denomTable"></tbody>
     </table>
 
-    <button class="btn-block btn-next" id="nextBtn" onclick="goToNextDept()">➔ 確定して 【 ② 】 へ進む</button>
-    <button class="btn-block" id="prevBtn" style="background:#94a3b8; color:white; font-size:13px; padding:8px; display:none;" onclick="goToPrevDept()">⬅︎ 前の項目に戻って修正する</button>
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
+        <button class="btn-block" id="nextStepBtn" style="width: 50%; background:#2563eb; color:white; font-size:15px; margin-bottom:0; padding: 12px;" onclick="goToNextStep()">次の項目へ（②）➔</button>
+    </div>
+    
+    <button class="btn-block" id="finalizeBtn" style="background: #10b981; color: white; background-image: linear-gradient(to bottom, #10b981, #059669);" onclick="scrollToSummary()">➔ 入力を完了して確定</button>
 
-    <div class="summary-box">
-        <div class="summary-title">📊 集計合算（リアルタイム連動）</div>
+    <div class="summary-box" id="summaryBox">
+        <div class="summary-title" id="summaryBoxTitle">📊 集計合算（入力中リアルタイム）</div>
         
         <div style="font-weight: bold; color: #1e3a8a; margin-bottom: 6px;">■ 項目別 集計一覧</div>
         <table class="report-table">
             <thead>
                 <tr>
-                    <th style="text-align: center; width: 15%;">項目</th>
-                    <th style="width: 28%;">売上高</th>
-                    <th style="width: 27%;">手数料</th>
-                    <th style="width: 30%;">持ち帰り金</th>
+                    <th style="text-align: center; width: 12%;">項目</th>
+                    <th style="width: 26%;">売上高</th>
+                    <th style="width: 24%;">手数料</th>
+                    <th style="width: 24%;">持帰金</th>
+                    <th style="text-align: center; width: 14%;">操作</th>
                 </tr>
             </thead>
-            <tbody id="reportDeptRows">
-                </tbody>
+            <tbody id="reportDeptRows"></tbody>
         </table>
 
         <div style="font-weight: bold; color: #1e3a8a; margin-bottom: 6px; margin-top: 15px;">■ 金種別 合計枚数・金額（全項目の合算）</div>
@@ -131,12 +145,11 @@
             <thead>
                 <tr>
                     <th>金種</th>
-                    <th style="width: 35%; text-align: center;">総合計枚数</th>
+                    <th style="width: 35%; text-align: center;">合計枚数</th>
                     <th style="width: 40%; text-align: right;">合計金額</th>
                 </tr>
             </thead>
-            <tbody id="reportDenomRows">
-                </tbody>
+            <tbody id="reportDenomRows"></tbody>
         </table>
 
         <button class="btn-block" style="background:#ec4899; color:white; margin-top:15px; margin-bottom:0; padding:10px; font-size:14px;" onclick="resetAllData()">🔄 データを全て消去して最初からやり直す</button>
@@ -145,12 +158,12 @@
 
 <script>
     const departments = [
-        { id: 1, name: "【 ① 】", label: "①" },
-        { id: 2, name: "【 ② 】", label: "②" },
-        { id: 3, name: "【 ③ 】", label: "③" },
-        { id: 4, name: "【 ④ 】", label: "④" },
-        { id: 5, name: "【 ⑤ 】", label: "⑤" },
-        { id: 6, name: "【 ⑥ 】", label: "⑥" }
+        { id: 1, name: "①", label: "①" },
+        { id: 2, name: "②", label: "②" },
+        { id: 3, name: "③", label: "③" },
+        { id: 4, name: "④", label: "④" },
+        { id: 5, name: "⑤", label: "⑤" },
+        { id: 6, name: "⑥", label: "⑥" }
     ];
 
     const denoms = [
@@ -170,24 +183,18 @@
     let currentDeptIndex = 0;
     let deptData = {};
     let visibleDenoms = {};
+    let globalFeeRate = 75;
+    let isFinalized = false; 
 
     function initDataStructure() {
         departments.forEach(dept => {
             if (!deptData[dept.id]) {
-                deptData[dept.id] = {
-                    feeRate: 75, // 初期デフォルト比率
-                    counts: {}
-                };
-                denoms.forEach(d => {
-                    deptData[dept.id].counts[d.value] = 0;
-                });
+                deptData[dept.id] = { counts: {} };
+                denoms.forEach(d => { deptData[dept.id].counts[d.value] = 0; });
             }
         });
-        
         if (Object.keys(visibleDenoms).length === 0) {
-            denoms.forEach(d => {
-                visibleDenoms[d.value] = true;
-            });
+            denoms.forEach(d => { visibleDenoms[d.value] = true; });
         }
     }
 
@@ -197,6 +204,9 @@
 
         const savedFilter = localStorage.getItem('seisan_visible_denoms');
         if (savedFilter) visibleDenoms = JSON.parse(savedFilter);
+
+        const savedRate = localStorage.getItem('seisan_global_feerate');
+        if (savedRate) globalFeeRate = parseFloat(savedRate);
 
         initDataStructure();
         renderFilterOptions();
@@ -238,11 +248,8 @@
         localStorage.setItem('seisan_visible_denoms', JSON.stringify(visibleDenoms));
         
         const row = document.getElementById(`denom-row-${value}`);
-        if (chk.checked) {
-            row.classList.remove('hidden-denom');
-        } else {
-            row.classList.add('hidden-denom');
-        }
+        if (chk.checked) row.classList.remove('hidden-denom');
+        else row.classList.add('hidden-denom');
         updateLiveReports();
     }
 
@@ -259,7 +266,7 @@
                     </td>
                     <td class="amount-area">
                         <span class="amount-disp" id="amount-${d.value}">¥0</span>
-                        <span class="cum-sheets-disp" id="cum-sheets-${d.value}">合算: 0枚</span>
+                        <span class="cum-sheets-disp" id="cum-sheets-${d.value}">(累計: 0枚)</span>
                     </td>
                 </tr>
             `;
@@ -268,18 +275,20 @@
     }
 
     function onInputCount(value) {
+        isFinalized = false; 
+
         const input = document.getElementById(`count-${value}`);
-        
         let val = input.value.replace(/[０-９]/g, function(s) {
             return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
         }).replace(/[^0-9]/g, '');
         
         input.value = val;
-        
         const count = parseInt(val, 10) || 0;
         
         let amt = count * value;
         if (value === 100000) amt = count;
+        
+        // 💡修正：タイポを修正 (amount -> value)
         document.getElementById(`amount-${value}`).innerText = "¥" + amt.toLocaleString();
         
         const currentDeptId = departments[currentDeptIndex].id;
@@ -290,16 +299,15 @@
     }
 
     function onInputFeeRate() {
+        isFinalized = false; 
         const input = document.getElementById('feeRate');
         let val = input.value.replace(/[０-９]/g, function(s) {
             return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
         }).replace(/[^0-9.]/g, '');
         
         input.value = val;
-        
-        const currentDeptId = departments[currentDeptIndex].id;
-        deptData[currentDeptId].feeRate = parseFloat(val) || 0;
-        localStorage.setItem('seisan_multidept_data', JSON.stringify(deptData));
+        globalFeeRate = parseFloat(val) || 0;
+        localStorage.setItem('seisan_global_feerate', globalFeeRate);
         updateLiveReports();
     }
 
@@ -312,19 +320,30 @@
                     totalSheets += (data.counts[d.value] || 0);
                 }
             });
-            
             const labelEl = document.getElementById(`cum-sheets-${d.value}`);
-            if (d.value === 100000) {
-                labelEl.innerText = `(合算累計: ¥${totalSheets.toLocaleString()})`;
-            } else {
-                labelEl.innerText = `(合算累計: ${totalSheets}枚)`;
+            if (labelEl) {
+                if (d.value === 100000) {
+                    labelEl.innerText = `(累計: ¥${totalSheets.toLocaleString()})`;
+                } else {
+                    labelEl.innerText = `(累計: ${totalSheets}枚)`;
+                }
             }
         });
     }
 
     function updateLiveReports() {
         const deptRowsTbody = document.getElementById('reportDeptRows');
+        if (!deptRowsTbody) return;
         deptRowsTbody.innerHTML = "";
+
+        const titleEl = document.getElementById('summaryBoxTitle');
+        if (titleEl) {
+            if (isFinalized) {
+                titleEl.innerText = "📊 集計合算（確定結果）";
+            } else {
+                titleEl.innerText = "📊 集計合算（入力中リアルタイム）";
+            }
+        }
 
         let grandTotalSales = 0;
         let grandTotalFee = 0;
@@ -333,7 +352,7 @@
         let totalDenomCounts = {};
         denoms.forEach(d => { totalDenomCounts[d.value] = 0; });
 
-        departments.forEach(dept => {
+        departments.forEach((dept, idx) => {
             const data = deptData[dept.id];
             let deptSales = 0;
 
@@ -342,27 +361,50 @@
                 let amt = count * d.value;
                 if (d.value === 100000) amt = count;
                 deptSales += amt;
-
                 totalDenomCounts[d.value] += count;
             });
 
-            const takehome = deptSales * (data.feeRate / 100);
-            const fee = deptSales * ((100 - data.feeRate) / 100);
+            const takehome = deptSales * (globalFeeRate / 100);
+            const fee = deptSales * ((100 - globalFeeRate) / 100);
 
-            grandTotalSales += deptSales;
-            grandTotalFee += fee;
-            grandTotalTakehome += takehome;
+            if (deptSales > 0) {
+                grandTotalSales += deptSales;
+                grandTotalFee += fee;
+                grandTotalTakehome += takehome;
+            }
 
-            const row = `
-                <tr>
-                    <td class="text-left">${dept.label}</td>
-                    <td>¥${deptSales.toLocaleString()}</td>
-                    <td>¥${Math.round(fee).toLocaleString()}</td>
-                    <td style="font-weight:bold; background:#faf5ff;">¥${Math.round(takehome).toLocaleString()}</td>
-                </tr>
-            `;
-            deptRowsTbody.insertAdjacentHTML('beforeend', row);
+            if (isFinalized) {
+                if (deptSales > 0) {
+                    const row = `
+                        <tr>
+                            <td class="text-left">${dept.label}</td>
+                            <td>¥${deptSales.toLocaleString()}</td>
+                            <td>¥${Math.round(fee).toLocaleString()}</td>
+                            <td style="font-weight:bold; background:#faf5ff;">¥${Math.round(takehome).toLocaleString()}</td>
+                            <td class="text-center">
+                                <button class="btn-edit" onclick="jumpToDept(${idx})">⚙️ 修正</button>
+                            </td>
+                        </tr>
+                    `;
+                    deptRowsTbody.insertAdjacentHTML('beforeend', row);
+                }
+            } else {
+                const row = `
+                    <tr>
+                        <td class="text-left">${dept.label}</td>
+                        <td>¥${deptSales.toLocaleString()}</td>
+                        <td>¥${Math.round(fee).toLocaleString()}</td>
+                        <td style="font-weight:bold; background:#faf5ff;">¥${Math.round(takehome).toLocaleString()}</td>
+                        <td class="text-center" style="color: #cbd5e1; font-size:11px;">-</td>
+                    </tr>
+                `;
+                deptRowsTbody.insertAdjacentHTML('beforeend', row);
+            }
         });
+
+        if (grandTotalSales === 0) {
+            deptRowsTbody.innerHTML = `<tr><td colspan="5" class="text-center" style="color:#94a3b8; padding:15px;">※入力された項目がありません</td></tr>`;
+        }
 
         const totalRow = `
             <tr class="row-total">
@@ -370,19 +412,22 @@
                 <td>¥${grandTotalSales.toLocaleString()}</td>
                 <td>¥${Math.round(grandTotalFee).toLocaleString()}</td>
                 <td style="background:#dcfce7;">¥${Math.round(grandTotalTakehome).toLocaleString()}</td>
+                <td></td>
             </tr>
         `;
         deptRowsTbody.insertAdjacentHTML('beforeend', totalRow);
 
         const denomRowsTbody = document.getElementById('reportDenomRows');
+        if (!denomRowsTbody) return;
         denomRowsTbody.innerHTML = "";
 
+        let hasAnyDenom = false;
         denoms.forEach(d => {
             const totalSheets = totalDenomCounts[d.value];
             if (totalSheets > 0) { 
+                hasAnyDenom = true;
                 let totalAmt = totalSheets * d.value;
                 if (d.value === 100000) totalAmt = totalSheets;
-
                 const displaySheetsStr = d.value === 100000 ? "-" : `${totalSheets} 枚`;
 
                 const dRow = `
@@ -396,18 +441,42 @@
             }
         });
 
+        if (!hasAnyDenom) {
+            denomRowsTbody.innerHTML = `<tr><td colspan="3" class="text-center" style="color:#94a3b8; padding:15px;">※枚数の入力がありません</td></tr>`;
+        }
+
         updateCumulativeLabels();
+        updateNavigationColors();
+    }
+
+    function updateNavigationColors() {
+        departments.forEach((dept, idx) => {
+            const btn = document.getElementById('stepNav-' + idx);
+            if (!btn) return;
+
+            btn.className = "step-btn";
+            if (idx === currentDeptIndex) {
+                btn.classList.add("btn-active");
+                return;
+            }
+
+            const data = deptData[dept.id];
+            let hasInput = false;
+            if (data && data.counts) {
+                hasInput = Object.values(data.counts).some(count => count > 0);
+            }
+
+            if (hasInput) btn.classList.add("btn-filled");
+            else btn.classList.add("btn-empty");
+        });
     }
 
     function loadCurrentDeptToUI() {
         const currentDept = departments[currentDeptIndex];
         const currentData = deptData[currentDept.id];
 
-        document.getElementById('currentStepLabel').innerText = `ステップ ${currentDeptIndex + 1} / 6`;
-        document.getElementById('currentDeptName').innerText = `カテゴリー項目 ${currentDept.name}`;
-        document.getElementById('inputTableTitle').innerText = `${currentDept.name} の枚数を入力してください`;
-
-        document.getElementById('feeRate').value = currentData.feeRate;
+        document.getElementById('currentDeptName').innerText = `現在入力中の項目：${currentDept.name}`;
+        document.getElementById('feeRate').value = globalFeeRate;
 
         denoms.forEach(d => {
             const count = currentData.counts[d.value] || 0;
@@ -417,52 +486,54 @@
             if (d.value === 100000) amt = count;
             document.getElementById(`amount-${d.value}`).innerText = "¥" + amt.toLocaleString();
         });
-
-        const nextBtn = document.getElementById('nextBtn');
+        
+        const nextStepBtn = document.getElementById('nextStepBtn');
         if (currentDeptIndex === departments.length - 1) {
-            nextBtn.innerText = "➔ 確定して最初の項目に戻る";
-            nextBtn.style.background = "#10b981";
+            nextStepBtn.innerText = `最初の項目へ（${departments[0].name}）🔄`;
+            nextStepBtn.style.background = "#64748b";
         } else {
-            const nextDeptName = departments[currentDeptIndex + 1].name;
-            nextBtn.innerText = `➔ 確定して ${nextDeptName} へ進む`;
-            nextBtn.style.background = "#2563eb";
+            const nextDept = departments[currentDeptIndex + 1];
+            nextStepBtn.innerText = `次の項目へ（${nextDept.name}）➔`;
+            nextStepBtn.style.background = "#2563eb";
         }
 
-        document.getElementById('prevBtn').style.display = currentDeptIndex > 0 ? "block" : "none";
+        updateNavigationColors();
     }
 
-    function goToNextDept() {
-        const currentDeptId = departments[currentDeptIndex].id;
-        deptData[currentDeptId].feeRate = parseFloat(document.getElementById('feeRate').value) || 0;
-        localStorage.setItem('seisan_multidept_data', JSON.stringify(deptData));
-
+    function goToNextStep() {
         if (currentDeptIndex < departments.length - 1) {
             currentDeptIndex++;
-            loadCurrentDeptToUI();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-            alert("全ての項目の入力が一周しました。下の表で確定データを確認・書き写しできます。");
             currentDeptIndex = 0; 
-            loadCurrentDeptToUI();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+        loadCurrentDeptToUI();
+        updateLiveReports(); // 移動時にもレポート更新
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function goToPrevDept() {
-        if (currentDeptIndex > 0) {
-            const currentDeptId = departments[currentDeptIndex].id;
-            deptData[currentDeptId].feeRate = parseFloat(document.getElementById('feeRate').value) || 0;
-            
-            currentDeptIndex--;
-            loadCurrentDeptToUI();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    function jumpToDept(index) {
+        isFinalized = false; 
+        currentDeptIndex = index;
+        loadCurrentDeptToUI();
+        updateLiveReports();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function scrollToSummary() {
+        isFinalized = true; 
+        updateLiveReports();
+        document.getElementById('summaryBox').scrollIntoView({ behavior: 'smooth' });
     }
 
     function resetAllData() {
-        if (confirm("全ての入力データ・手数料設定を完全にリセットします。よろしいですか？")) {
+        if (confirm("全ての入力データ・設定を完全にリセットします。よろしいですか？")) {
             localStorage.removeItem('seisan_multidept_data');
+            localStorage.removeItem('seisan_global_feerate');
+            
             deptData = {};
+            globalFeeRate = 75;
+            isFinalized = false;
+            
             initDataStructure();
             currentDeptIndex = 0;
             renderDenomRows();
