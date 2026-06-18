@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+　　<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>補充伝票取り込み（手動）/ 田口さん</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
@@ -575,10 +575,18 @@
         const rawDate = document.getElementById('inputDate').value;
         const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
         
-        const date6Digit = dateStr.length === 8 ? dateStr.slice(2) : dateStr;
-        const workerName = "田口（000025）";
+        // 🌟 ファイル名用：日付の月日4桁(MMDD)を取得
+        let date4Digit = "0000";
+        if (dateStr.length === 8) {
+            date4Digit = dateStr.slice(4); // YYYYMMDD の後ろ4桁
+        }
+
+        // 🌟 ファイル名用：登録地からスペースを除去、作業者から（000025）を除去して「田口」のみ抽出
+        const cleanLocation = locationStr.replace(/[\s\u3000]/g, '');
+        const workerName = "田口";
         
-        const fileName = `${date6Digit}【補充伝票_${locationStr}_${workerName}】.csv`;
+        // 新しいファイルタイトル仕様：0618(ヨドバシ上野・田口）補充伝票送付.csv
+        const fileName = `${date4Digit}(${cleanLocation}・${workerName}）補充伝票送付.csv`;
         const sortedList = getSortedDataList();
 
         let csvContent = "";
