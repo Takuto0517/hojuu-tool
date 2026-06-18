@@ -65,8 +65,8 @@
         .btn-calc.ok:active { background: #dc2626; }
 
         /* 📋 テーブル */
-        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; background: white; }
-        th, td { border: 1px solid #cbd5e1; padding: 8px 4px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; background: white; table-layout: fixed; }
+        th, td { border: 1px solid #cbd5e1; padding: 8px 4px; text-align: center; word-break: break-all; }
         th { background-color: #475569; color: white; font-size: 12px; }
         .log-box { max-height: 400px; overflow-y: auto; border: 2px solid #cbd5e1; padding: 4px; background: #fafafa; border-radius: 8px; margin-top: 5px; }
         .btn-delete { background-color: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
@@ -117,7 +117,6 @@
         <button id="clearBtn" class="btn-clear">🗑️ 画面をクリア（新規作成）</button>
     </div>
 
-    <!-- 🔍 表示項目フィルター機能 -->
     <div class="filter-card">
         <div class="filter-toggle" onclick="toggleFilterOptions()">
             <span>🔍 表示するカテゴリーを選択（クリックで展開）</span>
@@ -171,14 +170,15 @@
         <button class="btn-calc action" style="font-size: 22px;" onclick="toggleMinus()">ー</button>
     </div>
 
-    <h3 style="font-size: 14px; margin-bottom: 5px; margin-top: 15px; color:#1e293b;">📋 登録データ一覧（登場頻度順）</h3>
+    <h3 style="font-size: 14px; margin-bottom: 5px; margin-top: 15px; color:#1e293b;">📋 登録データ一覧（登録頻度順）</h3>
     <div class="log-box">
         <table>
             <thead>
                 <tr>
-                    <th style="width: 55%;">カテゴリー</th>
-                    <th style="width: 25%;">補充数</th>
-                    <th style="width: 20%;">操作</th>
+                    <th style="width: 35%;">カテゴリー</th>
+                    <th style="width: 25%;">補充</th>
+                    <th style="width: 25%;">引取</th>
+                    <th style="width: 15%;">操作</th>
                 </tr>
             </thead>
             <tbody id="dataTable"></tbody>
@@ -216,7 +216,7 @@
         { id: "c5", name: "Jカード200", csvName: "ｼﾞｬﾝﾎﾞｶｰﾄﾞﾀﾞｽ200", group: "carddas" },
         { id: "c6", name: "Jカード300", csvName: "ｼﾞｬﾝﾎﾞｶｰﾄﾞﾀﾞｽ300", group: "carddas" },
         { id: "m1", name: "ｶﾌﾟｾﾙ100", csvName: "ｶﾌﾟｾﾙ100/", group: "capsule" },
-        { id: "m2", name: "ｶﾌﾟｾﾙ200", csvName: "ｶﾌﾟｾﾙ200/ﾌﾟﾁｺﾛ200", group: "capsule" },
+        { id: "m2", name: "ｶﾌﾟｾﾙ200", csvName: "ｶﾌﾟｾﾙ200/ﾌﾟﾁコロ200", group: "capsule" },
         { id: "m3", name: "ｶﾌﾟｾﾙ300", csvName: "ｶﾌﾟｾﾙ300", group: "capsule" },
         { id: "m4", name: "ｶﾌﾟｾﾙ400", csvName: "ｶﾌﾟｾﾙ400", group: "capsule" },
         { id: "m5", name: "ｶﾌﾟｾﾙ500", csvName: "ｶﾌﾟｾﾙ500", group: "capsule" },
@@ -500,28 +500,56 @@
         });
     }
 
+    // 📋 表示用のテーブル描画ロジック
     function renderTable() {
         dataTable.innerHTML = "";
-        const sortedList = getSortedDataList();
 
-        sortedList.forEach((item) => {
-            const originalIndex = dataList.findIndex(orig => orig.timestamp === item.timestamp);
-            const row = `<tr>
-                <td style="text-align:left; font-weight:bold; padding-left:8px;">${item.categoryName}</td>
-                <td style="font-weight:bold;">${item.count}</td>
-                <td><button class="btn-delete" onclick="deleteRow(${originalIndex})">削除</button></td>
-            </tr>`;
-            dataTable.insertAdjacentHTML('beforeend', row);
+        // 設定欄の並び順（categoryMasterの順番）でデータを集計して回す
+        categoryMaster.forEach((cat) => {
+            // このカテゴリーに属するデータを抽出
+            const catItems = dataList.filter(item => item.categoryId === cat.id);
+            
+            // データが存在する場合のみ行を生成
+            if (catItems.length > 0) {
+                const hojuuList = [];
+                const hikitoriList = [];
+
+                catItems.forEach(item => {
+                    if (item.count > 0) {
+                        hojuuList.push(item.count);
+                    } else if (item.count < 0) {
+                        hikitoriList.push(Math.abs(item.count)); // 引取は絶対値で表示
+                    }
+                });
+
+                const hojuuStr = hojuuList.length > 0 ? hojuuList.join(',') : '';
+                const hikitoriStr = hikitoriList.length > 0 ? hikitoriList.join(',') : '';
+
+                const row = `<tr>
+                    <td style="text-align:left; font-weight:bold; padding-left:8px;">${cat.name}</td>
+                    <td style="font-weight:bold; color:#1e3a8a;">${hojuuStr}</td>
+                    <td style="font-weight:bold; color:#b91c1c;">${hikitoriStr}</td>
+                    <td><button class="btn-delete" onclick="deleteLatestCategoryRow('${cat.id}')">削除</button></td>
+                </tr>`;
+                dataTable.insertAdjacentHTML('beforeend', row);
+            }
         });
         csvBtn.disabled = dataList.length === 0;
     }
 
-    window.deleteRow = function(index) {
-        if (index > -1) {
-            dataList.splice(index, 1);
-            renderTable();
-            saveToStorage();
+    // 🌟 【仕様変更】特定のカテゴリーの「最も新しく入力した数値」だけを1つ消去する関数
+    window.deleteLatestCategoryRow = function(categoryId) {
+        // 全体の登録データ(dataList)を「最後(最新)のものから逆順」に確認
+        for (let i = dataList.length - 1; i >= 0; i--) {
+            if (dataList[i].categoryId === categoryId) {
+                // 一番最初に見つかった該当カテゴリーのデータ(＝最新の入力値)を配列から1個だけ消す
+                dataList.splice(i, 1);
+                break;
+            }
         }
+        // 画面の表を再描画し、端末保存
+        renderTable();
+        saveToStorage();
     };
 
     function playBeep(freq, duration) {
@@ -529,7 +557,7 @@
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            oscillator.type = 'sine';
+             oscillator.type = 'sine';
             oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
             gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
             oscillator.connect(gainNode);
@@ -558,7 +586,6 @@
             const itemInfo = categoryMaster.find(c => c.id === item.categoryId);
             const csvName = itemInfo ? itemInfo.csvName : item.categoryName;
             
-            // 🌟 Excelでの「頭ゼロ見切れ」を防ぐため、="文字列" 形式で出力するように修正
             const formatLocationCode = `="${customerCode}"`;
             const formatWorkerCode = `="000025"`;
             
