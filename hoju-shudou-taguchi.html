@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-　　<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>補充伝票取り込み（手動）/ 田口さん</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
@@ -61,8 +61,13 @@
         .btn-calc { background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 14px 0; font-size: 18px; font-weight: bold; color: #1f2937; cursor: pointer; text-align: center; user-select: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .btn-calc:active { background: #f3f4f6; }
         .btn-calc.action { color: #d97706; background: #fffbeb; border-color: #fde68a; }
+        .btn-calc.lot { color: #2563eb; background: #eff6ff; border-color: #bfdbfe; font-size: 16px; width: 100%; height: 100%; }
+        .btn-calc.lot:active { background: #dbeafe; }
         .btn-calc.ok { grid-row: span 2; display: flex; align-items: center; justify-content: center; background: #ef4444; color: white; border-color: #dc2626; font-size: 18px; }
         .btn-calc.ok:active { background: #dc2626; }
+        
+        /* 🌟 ロットボタン用の結合コンテナ */
+        .lot-container { grid-column: span 3; display: flex; gap: 6px; }
 
         /* 📋 テーブル */
         table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; background: white; table-layout: fixed; }
@@ -168,6 +173,11 @@
 
         <button class="btn-calc" style="grid-column: span 2;" onclick="pressNum('0')">0</button>
         <button class="btn-calc action" style="font-size: 22px;" onclick="toggleMinus()">ー</button>
+
+        <div class="lot-container">
+            <button class="btn-calc lot" onclick="pressLot('20')">20</button>
+            <button class="btn-calc lot" onclick="pressLot('30')">30</button>
+        </div>
     </div>
 
     <h3 style="font-size: 14px; margin-bottom: 5px; margin-top: 15px; color:#1e293b;">📋 登録データ一覧</h3>
@@ -216,7 +226,7 @@
         { id: "c5", name: "Jカード200", csvName: "ｼﾞｬﾝﾎﾞｶｰﾄﾞﾀﾞｽ200", group: "carddas" },
         { id: "c6", name: "Jカード300", csvName: "ｼﾞｬﾝﾎﾞｶｰﾄﾞﾀﾞｽ300", group: "carddas" },
         { id: "m1", name: "ｶﾌﾟｾﾙ100", csvName: "ｶﾌﾟｾﾙ100/", group: "capsule" },
-        { id: "m2", name: "ｶﾌﾟｾﾙ200", csvName: "ｶﾌﾟｾﾙ200/ﾌﾟﾁコロ200", group: "capsule" },
+        { id: "m2", name: "ｶﾌﾟｾﾙ200", csvName: "ｶﾌﾟｾﾙ200/ﾌﾟチコロ200", group: "capsule" },
         { id: "m3", name: "ｶﾌﾟｾﾙ300", csvName: "ｶﾌﾟｾﾙ300", group: "capsule" },
         { id: "m4", name: "ｶﾌﾟｾﾙ400", csvName: "ｶﾌﾟｾﾙ400", group: "capsule" },
         { id: "m5", name: "ｶﾌﾟｾﾙ500", csvName: "ｶﾌﾟｾﾙ500", group: "capsule" },
@@ -422,6 +432,17 @@
         playBeep(1200, 0.03);
     }
 
+    function pressLot(lotNum) {
+        if (selectedCategoryId === null) {
+            alert("先に上のカテゴリーを選択してください！");
+            return;
+        }
+        let isMinus = currentCountStr.startsWith('-');
+        currentCountStr = (isMinus ? '-' : '') + lotNum;
+        updateDisplay();
+        playBeep(1200, 0.05);
+    }
+
     function toggleMinus() {
         if (selectedCategoryId === null) {
             alert("先に上のカテゴリーを選択してください！");
@@ -500,16 +521,12 @@
         });
     }
 
-    // 📋 表示用のテーブル描画ロジック
     function renderTable() {
         dataTable.innerHTML = "";
 
-        // 設定欄の並び順（categoryMasterの順番）でデータを集計して回す
         categoryMaster.forEach((cat) => {
-            // このカテゴリーに属するデータを抽出
             const catItems = dataList.filter(item => item.categoryId === cat.id);
             
-            // データが存在する場合のみ行を生成
             if (catItems.length > 0) {
                 const hojuuList = [];
                 const hikitoriList = [];
@@ -518,7 +535,7 @@
                     if (item.count > 0) {
                         hojuuList.push(item.count);
                     } else if (item.count < 0) {
-                        hikitoriList.push(Math.abs(item.count)); // 引取は絶対値で表示
+                        hikitoriList.push(Math.abs(item.count));
                     }
                 });
 
@@ -537,17 +554,13 @@
         csvBtn.disabled = dataList.length === 0;
     }
 
-    // 🌟 【仕様変更】特定のカテゴリーの「最も新しく入力した数値」だけを1つ消去する関数
     window.deleteLatestCategoryRow = function(categoryId) {
-        // 全体の登録データ(dataList)を「最後(最新)のものから逆順」に確認
         for (let i = dataList.length - 1; i >= 0; i--) {
             if (dataList[i].categoryId === categoryId) {
-                // 一番最初に見つかった該当カテゴリーのデータ(＝最新の入力値)を配列から1個だけ消す
                 dataList.splice(i, 1);
                 break;
             }
         }
-        // 画面の表を再描画し、端末保存
         renderTable();
         saveToStorage();
     };
@@ -557,7 +570,7 @@
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-             oscillator.type = 'sine';
+            oscillator.type = 'sine';
             oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
             gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
             oscillator.connect(gainNode);
@@ -575,17 +588,14 @@
         const rawDate = document.getElementById('inputDate').value;
         const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
         
-        // 🌟 ファイル名用：日付の月日4桁(MMDD)を取得
         let date4Digit = "0000";
         if (dateStr.length === 8) {
-            date4Digit = dateStr.slice(4); // YYYYMMDD の後ろ4桁
+            date4Digit = dateStr.slice(4);
         }
 
-        // 🌟 ファイル名用：登録地からスペースを除去、作業者から（000025）を除去して「田口」のみ抽出
         const cleanLocation = locationStr.replace(/[\s\u3000]/g, '');
         const workerName = "田口";
         
-        // 新しいファイルタイトル仕様：0618(ヨドバシ上野・田口）補充伝票送付.csv
         const fileName = `${date4Digit}(${cleanLocation}・${workerName}）補充伝票送付.csv`;
         const sortedList = getSortedDataList();
 
