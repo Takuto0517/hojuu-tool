@@ -21,12 +21,16 @@
         .meta-row-center select, .meta-row-center input { width: 220px; padding: 8px; font-size: 14px; border: 2px solid #cbd5e1; border-radius: 6px; background-color: white; font-weight: bold; }
         .meta-row-center input:disabled { background-color: #e2e8f0; color: #64748b; border-color: #cbd5e1; }
 
-        /* 💾 保存・クリアボタン */
+        /* 💾 各種ボタン配置 */
         .save-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .btn-save { background-color: #f59e0b; color: white; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 6px; flex: 1; cursor: pointer; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-clear { background-color: #64748b; color: white; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 6px; flex: 1; cursor: pointer; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-        /* 🔍 表示項目フィルター機能（グループ分け対応） */
+        /* 🚀 拠点完了ボタン */
+        .btn-location-complete { background-color: #2563eb; color: white; width: 100%; margin: 15px 0 10px 0; padding: 14px; font-size: 15px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.2); text-align: center; }
+        .btn-location-complete:active { background-color: #1d4ed8; }
+
+        /* 🔍 表示項目フィルター機能 */
         .filter-card { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; padding: 8px 12px; }
         .filter-toggle { font-size: 13px; font-weight: bold; color: #2563eb; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
         .filter-options { display: none; flex-direction: column; gap: 10px; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #cbd5e1; }
@@ -49,7 +53,6 @@
         .btn-category.selected { background: #e0f2fe; border-color: #0284c7; color: #0369a1; box-shadow: 0 0 0 2px rgba(3,105,161,0.2); }
         .btn-category.hidden-item { display: none !important; }
 
-        /* 各グループ用の色づけ */
         .grp-carddas .btn-category.selected { background: #fef2f2; border-color: #ef4444; color: #b91c1c; }
         .grp-capsule .btn-category.selected { background: #f0fdf4; border-color: #22c55e; color: #15803d; }
         .grp-vag .btn-category.selected { background: #fdf2ff; border-color: #d946ef; color: #a21caf; }
@@ -65,19 +68,25 @@
         .btn-calc.lot:active { background: #dbeafe; }
         .btn-calc.ok { grid-row: span 2; display: flex; align-items: center; justify-content: center; background: #ef4444; color: white; border-color: #dc2626; font-size: 18px; }
         .btn-calc.ok:active { background: #dc2626; }
-        
-        /* 🌟 ロットボタン用の結合コンテナ */
         .lot-container { grid-column: span 3; display: flex; gap: 6px; }
 
-        /* 📋 テーブル */
+        /* 📋 テーブル・入力履歴 */
         table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; background: white; table-layout: fixed; }
         th, td { border: 1px solid #cbd5e1; padding: 8px 4px; text-align: center; word-break: break-all; }
         th { background-color: #475569; color: white; font-size: 12px; }
-        .log-box { max-height: 400px; overflow-y: auto; border: 2px solid #cbd5e1; padding: 4px; background: #fafafa; border-radius: 8px; margin-top: 5px; }
+        .log-box { max-height: 250px; overflow-y: auto; border: 2px solid #cbd5e1; padding: 4px; background: #fafafa; border-radius: 8px; margin-top: 5px; }
         .btn-delete { background-color: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
         
-        .btn-csv { background-color: #2563eb; color: white; width: 100%; margin-top: 15px; padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(37,99,235,0.2); }
+        /* 📍 入力完了済みの登録地エリア */
+        .completed-section { background: #f0fdf4; border: 2px dashed #22c55e; border-radius: 10px; padding: 12px; margin-top: 15px; }
+        .completed-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+        .btn-completed-loc { background: white; border: 1px solid #bbf7d0; border-radius: 20px; padding: 8px 14px; font-size: 12px; font-weight: bold; color: #166534; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 4px; }
+        .btn-completed-loc:active { background: #dcfce7; }
+
+        /* 📥 下部アクション群 */
+        .btn-csv { background-color: #10b981; color: white; width: 100%; margin-top: 20px; padding: 14px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(16,185,129,0.2); }
         .btn-csv:disabled { background-color: #cbd5e1; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+        .btn-all-clear { background-color: #ef4444; color: white; width: 100%; margin-top: 10px; padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; text-align: center; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -118,8 +127,8 @@
     </div>
 
     <div class="save-group">
-        <button id="saveBtn" class="btn-save">💾 データを手動保存</button>
-        <button id="clearBtn" class="btn-clear">🗑️ 画面をクリア（新規作成）</button>
+        <button id="saveBtn" class="btn-save">💾 バックアップ保存</button>
+        <button id="clearBtn" class="btn-clear">🗑️ 今の画面をクリア</button>
     </div>
 
     <div class="filter-card">
@@ -180,7 +189,9 @@
         </div>
     </div>
 
-    <h3 style="font-size: 14px; margin-bottom: 5px; margin-top: 15px; color:#1e293b;">📋 登録データ一覧</h3>
+    <button id="locCompleteBtn" class="btn-location-complete" onclick="completeCurrentLocation()">➔ この登録地での集計を完了する</button>
+
+    <h3 style="font-size: 14px; margin-bottom: 5px; margin-top: 15px; color:#1e293b;">📋 現在の登録地のデータ一覧</h3>
     <div class="log-box">
         <table>
             <thead>
@@ -195,7 +206,13 @@
         </table>
     </div>
 
-    <button id="csvBtn" class="btn-csv" disabled>Excel用CSVをダウンロード</button>
+    <div class="completed-section">
+        <div style="font-size: 13px; font-weight: bold; color: #166534;">✅ 入力完了済みの登録地（タップで復元・修正）</div>
+        <div class="completed-list" id="completedLocList"></div>
+    </div>
+
+    <button id="csvBtn" class="btn-csv" disabled>Excel用CSVを一括ダウンロード</button>
+    <button id="allClearBtn" class="btn-all-clear" onclick="clearAllData()">⚠️ すべてのデータを完全クリア（初期化）</button>
 </div>
 
 <script>
@@ -226,7 +243,7 @@
         { id: "c5", name: "Jカード200", csvName: "ｼﾞｬﾝﾎﾞｶｰﾄﾞﾀﾞｽ200", group: "carddas" },
         { id: "c6", name: "Jカード300", csvName: "ｼﾞｬﾝﾎﾞｶｰﾄﾞﾀﾞｽ300", group: "carddas" },
         { id: "m1", name: "ｶﾌﾟｾﾙ100", csvName: "ｶﾌﾟｾﾙ100/", group: "capsule" },
-        { id: "m2", name: "ｶﾌﾟｾﾙ200", csvName: "ｶﾌﾟｾﾙ200/ﾌﾟチコロ200", group: "capsule" },
+        { id: "m2", name: "ｶﾌﾟｾﾙ200", csvName: "ｶﾌﾟｾﾙ200/ﾌﾟﾁｺﾛ200", group: "capsule" },
         { id: "m3", name: "ｶﾌﾟｾﾙ300", csvName: "ｶﾌﾟｾﾙ300", group: "capsule" },
         { id: "m4", name: "ｶﾌﾟｾﾙ400", csvName: "ｶﾌﾟｾﾙ400", group: "capsule" },
         { id: "m5", name: "ｶﾌﾟｾﾙ500", csvName: "ｶﾌﾟｾﾙ500", group: "capsule" },
@@ -248,7 +265,9 @@
         cardgame: "ーー カードゲーム ーー"
     };
 
-    let dataList = [];
+    let dataList = []; 
+    let allLocationsData = {}; 
+
     let selectedCategoryId = null;
     let currentCountStr = "";
     let visibleCategories = {};
@@ -258,6 +277,7 @@
     const csvBtn = document.getElementById('csvBtn');
     const saveBtn = document.getElementById('saveBtn');
     const clearBtn = document.getElementById('clearBtn');
+    const completedLocList = document.getElementById('completedLocList');
 
     window.addEventListener('DOMContentLoaded', () => {
         const today = new Date();
@@ -267,11 +287,13 @@
         document.getElementById('inputDate').value = `${yyyy}-${mm}-${dd}`;
 
         const savedData = localStorage.getItem('hojuu_hand_data');
+        const savedAllData = localStorage.getItem('hojuu_all_locations_data');
         const savedLocation = localStorage.getItem('hojuu_hand_location');
         const savedDate = localStorage.getItem('hojuu_hand_date');
         const savedFilter = localStorage.getItem('hojuu_visible_categories');
 
         if (savedData) dataList = JSON.parse(savedData);
+        if (savedAllData) allLocationsData = JSON.parse(savedAllData);
         if (savedLocation) document.getElementById('inputLocation').value = savedLocation;
         if (savedDate) document.getElementById('inputDate').value = savedDate;
 
@@ -285,6 +307,7 @@
         renderFilterOptions();
         checkGroupVisibility();
         renderTable();
+        renderCompletedLocations();
         updateDisplay();
     });
 
@@ -382,27 +405,99 @@
 
     function saveToStorage(isManual = false) {
         localStorage.setItem('hojuu_hand_data', JSON.stringify(dataList));
+        localStorage.setItem('hojuu_all_locations_data', JSON.stringify(allLocationsData));
         localStorage.setItem('hojuu_hand_location', document.getElementById('inputLocation').value);
         localStorage.setItem('hojuu_hand_date', document.getElementById('inputDate').value);
         if (isManual) {
             playBeep(1000, 0.1);
-            alert("現在のデータを端末内に保存しました！");
+            alert("現在の状態を端末内に保存しました！");
         }
     }
 
     saveBtn.addEventListener('click', () => saveToStorage(true));
 
     clearBtn.addEventListener('click', () => {
-        if (confirm("画面のデータを一括クリアします。よろしいですか？")) {
-            dataList = [];
-            renderTable();
-            localStorage.removeItem('hojuu_hand_data');
-            selectedCategoryId = null;
-            currentCountStr = "";
-            document.querySelectorAll('.btn-category').forEach(b => b.classList.remove('selected'));
-            updateDisplay();
+        if (confirm("現在の画面の入力データをクリアします。よろしいですか？")) {
+            resetCurrentView();
+            saveToStorage();
         }
     });
+
+    window.completeCurrentLocation = function() {
+        const loc = document.getElementById('inputLocation').value;
+        if (dataList.length === 0) {
+            alert("現在の登録地にはデータが入力されていません。");
+            return;
+        }
+
+        allLocationsData[loc] = [...dataList];
+        
+        playBeep(1000, 0.3);
+        alert(`【${loc}】の集計データを完了フォルダにプールしました。次の登録地を選択してください。`);
+        
+        resetCurrentView();
+        renderCompletedLocations();
+        saveToStorage();
+    };
+
+    function renderCompletedLocations() {
+        completedLocList.innerHTML = "";
+        const keys = Object.keys(allLocationsData);
+        if (keys.length === 0) {
+            completedLocList.innerHTML = `<span style="font-size:12px; color:#94a3b8;">完了済みの登録地はまだありません</span>`;
+            updateCsvButtonState();
+            return;
+        }
+
+        keys.forEach(loc => {
+            const btn = document.createElement('button');
+            btn.className = "btn-completed-loc";
+            btn.innerHTML = `📍 ${loc} (${allLocationsData[loc].length}件)`;
+            btn.onclick = () => restoreLocationData(loc);
+            completedLocList.appendChild(btn);
+        });
+        updateCsvButtonState();
+    }
+
+    function restoreLocationData(loc) {
+        if (dataList.length > 0) {
+            if (!confirm("現在画面に入力中のデータがあります。切り替えると今の画面のデータは消去されますが、よろしいですか？\n(消したくない場合は先に「登録地での集計を完了する」を押してください)")) {
+                return;
+            }
+        }
+        document.getElementById('inputLocation').value = loc;
+        dataList = [...allLocationsData[loc]];
+        
+        delete allLocationsData[loc];
+        
+        renderTable();
+        renderCompletedLocations();
+        saveToStorage();
+        playBeep(800, 0.1);
+        alert(`【${loc}】のデータを編集画面に戻しました。修正後に再度完了ボタンを押してください。`);
+    }
+
+    window.clearAllData = function() {
+        if (confirm("⚠️ 警告\n現在入力中のデータ、およびこれまでに完了したすべての登録地データを完全に消去します。本当によろしいですか？")) {
+            dataList = [];
+            allLocationsData = {};
+            resetCurrentView();
+            renderCompletedLocations();
+            localStorage.removeItem('hojuu_hand_data');
+            localStorage.removeItem('hojuu_all_locations_data');
+            playBeep(400, 0.5);
+            alert("すべてのデータを初期化しました。");
+        }
+    };
+
+    function resetCurrentView() {
+        dataList = [];
+        selectedCategoryId = null;
+        currentCountStr = "";
+        document.querySelectorAll('.btn-category').forEach(b => b.classList.remove('selected'));
+        renderTable();
+        updateDisplay();
+    }
 
     function selectCategory(id) {
         selectedCategoryId = id;
@@ -507,18 +602,10 @@
         }
     }
 
-    function getSortedDataList() {
-        const counts = {};
-        dataList.forEach(item => { counts[item.categoryId] = (counts[item.categoryId] || 0) + 1; });
-        const masterOrder = {};
-        categoryMaster.forEach((c, idx) => { masterOrder[c.id] = idx; });
-
-        return [...dataList].sort((a, b) => {
-            const countA = counts[a.categoryId] || 0;
-            const countB = counts[b.categoryId] || 0;
-            if (countB !== countA) return countB - countA;
-            return masterOrder[a.categoryId] - masterOrder[b.categoryId];
-        });
+    function updateCsvButtonState() {
+        const hasActiveData = dataList.length > 0;
+        const hasPooledData = Object.keys(allLocationsData).length > 0;
+        csvBtn.disabled = !(hasActiveData || hasPooledData);
     }
 
     function renderTable() {
@@ -551,7 +638,7 @@
                 dataTable.insertAdjacentHTML('beforeend', row);
             }
         });
-        csvBtn.disabled = dataList.length === 0;
+        updateCsvButtonState();
     }
 
     window.deleteLatestCategoryRow = function(categoryId) {
@@ -581,33 +668,66 @@
     }
 
     csvBtn.addEventListener('click', () => {
-        if (dataList.length === 0) return;
+        const finalExportData = {};
         
-        const locationStr = document.getElementById('inputLocation').value;
-        const customerCode = locationMaster[locationStr] || "000000";
+        Object.keys(allLocationsData).forEach(loc => {
+            finalExportData[loc] = [...allLocationsData[loc]];
+        });
+
+        const currentLoc = document.getElementById('inputLocation').value;
+        if (dataList.length > 0) {
+            if (finalExportData[currentLoc]) {
+                finalExportData[currentLoc] = finalExportData[currentLoc].concat(dataList);
+            } else {
+                finalExportData[currentLoc] = [...dataList];
+            }
+        }
+
+        if (Object.keys(finalExportData).length === 0) return;
+        
         const rawDate = document.getElementById('inputDate').value;
         const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
         
         let date4Digit = "0000";
-        if (dateStr.length === 8) {
-            date4Digit = dateStr.slice(4);
-        }
+        if (dateStr.length === 8) { date4Digit = dateStr.slice(4); }
 
-        const cleanLocation = locationStr.replace(/[\s\u3000]/g, '');
         const workerName = "田口";
+        const totalLocCount = Object.keys(finalExportData).length;
+        const firstLocName = Object.keys(finalExportData)[0].replace(/[\s\u3000]/g, '');
         
-        const fileName = `${date4Digit}(${cleanLocation}・${workerName}）補充伝票送付.csv`;
-        const sortedList = getSortedDataList();
+        let fileLocLabel = firstLocName;
+        if (totalLocCount > 1) {
+            fileLocLabel = `${firstLocName}等_${totalLocCount}箇所`;
+        }
+        const fileName = `${date4Digit}【${workerName}/補充伝票_${fileLocLabel}】.csv`;
 
+        // 🌟 修正：ダミー空行の削除（1行目から直接データを書き出します）
         let csvContent = "";
-        sortedList.forEach(item => {
-            const itemInfo = categoryMaster.find(c => c.id === item.categoryId);
-            const csvName = itemInfo ? itemInfo.csvName : item.categoryName;
-            
-            const formatLocationCode = `="${customerCode}"`;
-            const formatWorkerCode = `="000025"`;
-            
-            csvContent += `${dateStr},${formatLocationCode},${formatWorkerCode},${csvName},${item.count}\r\n`;
+
+        Object.keys(finalExportData).forEach(locName => {
+            const customerCode = locationMaster[locName] || "000000";
+            const targetList = finalExportData[locName];
+
+            const counts = {};
+            targetList.forEach(item => { counts[item.categoryId] = (counts[item.categoryId] || 0) + 1; });
+            const masterOrder = {};
+            categoryMaster.forEach((c, idx) => { masterOrder[c.id] = idx; });
+
+            const sortedList = [...targetList].sort((a, b) => {
+                const countA = counts[a.categoryId] || 0;
+                const countB = counts[b.categoryId] || 0;
+                if (countB !== countA) return countB - countA;
+                return masterOrder[a.categoryId] - masterOrder[b.categoryId];
+            });
+
+            sortedList.forEach(item => {
+                const itemInfo = categoryMaster.find(c => c.id === item.categoryId);
+                const csvName = itemInfo ? itemInfo.csvName : item.categoryName;
+                const formatLocationCode = `="${customerCode}"`;
+                const formatWorkerCode = `="000025"`;
+                
+                csvContent += `${dateStr},${formatLocationCode},${formatWorkerCode},${csvName},${item.count}\r\n`;
+            });
         });
         
         const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
