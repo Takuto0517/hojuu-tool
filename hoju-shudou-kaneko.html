@@ -2,15 +2,25 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>補充伝票取り込み（手動）/ 金子さん</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
+        
+        /* 📱 画面全体の拡大・縮小・バウンスをcssレベルでロック */
+        html, body {
+            overflow-x: hidden;
+            position: relative;
+            width: 100%;
+        }
+
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 10px; background-color: #f1f5f9; color: #1e293b; font-size: 14px; }
         
-        /* 📱 すべてのボタンやタップ要素で、ダブルタップによるズームを禁止する */
+        /* 📱 すべてのタップ要素で、ダブルタップによるズームを禁止 */
         button, input, select, .filter-toggle, .filter-item, .btn-category, .btn-calc {
-            touch-action: manipulation;
+            touch-action: manipulation !important;
+            -webkit-user-select: none; /* ボタンの文字選択によるズームも防止 */
+            user-select: none;
         }
 
         /* 💡 iOSのフォームズームを絶対に発生させないよう、16pxを最優先で強制 */
@@ -18,7 +28,7 @@
             font-size: 16px !important;
         }
 
-        .container { max-width: 650px; margin: 0 auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .container { max-width: 650px; margin: 0 auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); width: 100%; }
         h1 { text-align: center; font-size: 19px; color: #0f172a; margin: 5px 0 15px 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; }
         
         /* 📱 スマホ用入力エリア */
@@ -75,7 +85,7 @@
         /* 🔢 電卓風表示・テンキー */
         .calc-display { background: #1e293b; color: #38bdf8; font-size: 24px; font-weight: bold; text-align: right; padding: 12px; border-radius: 6px; margin-bottom: 10px; min-height: 52px; font-family: monospace; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center; }
         .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 15px; }
-        .btn-calc { background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 14px 0; font-size: 18px; font-weight: bold; color: #1f2937; cursor: pointer; text-align: center; user-select: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .btn-calc { background: white; border: 1px solid #d1d5db; border-radius: 6px; padding: 14px 0; font-size: 18px; font-weight: bold; color: #1f2937; cursor: pointer; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .btn-calc:active { background: #f3f4f6; }
         .btn-calc.action { color: #d97706; background: #fffbeb; border-color: #fde68a; }
         .btn-calc.lot { color: #2563eb; background: #eff6ff; border-color: #bfdbfe; font-size: 16px; width: 100%; height: 100%; }
@@ -84,15 +94,15 @@
         .btn-calc.ok:active { background: #dc2626; }
         .lot-container { grid-column: span 3; display: flex; gap: 6px; }
 
-        /* 📋 テーブル・入力履歴 */
-        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; background: white; table-layout: fixed; }
-        th, td { border: 1px solid #cbd5e1; padding: 8px 4px; text-align: center; word-break: break-all; }
-        th { background-color: #475569; color: white; font-size: 12px; }
-        .log-box { max-height: 250px; overflow-y: auto; border: 2px solid #cbd5e1; padding: 4px; background: #fafafa; border-radius: 8px; margin-top: 5px; }
-        .btn-delete { background-color: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+        /* 📋 テーブル・入力履歴まではみ出しを徹底防御 */
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 12px; background: white; table-layout: fixed; }
+        th, td { border: 1px solid #cbd5e1; padding: 6px 2px; text-align: center; word-break: break-all; overflow: hidden; text-overflow: ellipsis; }
+        th { background-color: #475569; color: white; font-size: 11px; }
+        .log-box { max-height: 250px; overflow-y: auto; overflow-x: hidden; border: 2px solid #cbd5e1; padding: 4px; background: #fafafa; border-radius: 8px; margin-top: 5px; width: 100%; }
+        .btn-delete { background-color: #ef4444; color: white; border: none; padding: 4px 6px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
         
         /* 📍 入力完了済みの登録地エリア */
-        .completed-section { background: #f0fdf4; border: 2px dashed #22c55e; border-radius: 10px; padding: 12px; margin-top: 15px; }
+        .completed-section { background: #f0fdf4; border: 2px dashed #22c55e; border-radius: 10px; padding: 12px; margin-top: 15px; width: 100%; }
         .completed-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
         .btn-completed-loc { background: white; border: 1px solid #bbf7d0; border-radius: 20px; padding: 8px 14px; font-size: 12px; font-weight: bold; color: #166534; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 4px; }
         .btn-completed-loc:active { background: #dcfce7; }
@@ -208,10 +218,10 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 35%;">カテゴリー</th>
-                    <th style="width: 25%;">補充</th>
-                    <th style="width: 25%;">引取</th>
-                    <th style="width: 15%;">操作</th>
+                    <th style="width: 40%;">カテゴリー</th>
+                    <th style="width: 23%;">補充</th>
+                    <th style="width: 23%;">引取</th>
+                    <th style="width: 14%;">操作</th>
                 </tr>
             </thead>
             <tbody id="dataTable"></tbody>
@@ -228,6 +238,18 @@
 </div>
 
 <script>
+    // 📱 iOS用の強制ズームキャンセルJavaScript (究極の防御)
+    document.addEventListener('touchstart', (e) => {
+        if (e.touches.length > 1) { e.preventDefault(); } // 2本指ズームを禁止
+    }, { passive: false });
+
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) { e.preventDefault(); } // ダブルタップズームを物理破壊
+        lastTouchEnd = now;
+    }, false);
+
     const locationMaster = {
         "丸広百貨店入間": "002036",
         "狭山市立博物館": "003557",
@@ -640,7 +662,7 @@
                 const hikitoriStr = hikitoriList.length > 0 ? hikitoriList.join(',') : '';
 
                 const row = `<tr>
-                    <td style="text-align:left; font-weight:bold; padding-left:8px;">${cat.name}</td>
+                    <td style="text-align:left; font-weight:bold; padding-left:4px;">${cat.name}</td>
                     <td style="font-weight:bold; color:#1e3a8a;">${hojuuStr}</td>
                     <td style="font-weight:bold; color:#b91c1c;">${hikitoriStr}</td>
                     <td><button class="btn-delete" onclick="deleteLatestCategoryRow('${cat.id}')">削除</button></td>
