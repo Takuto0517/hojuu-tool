@@ -7,6 +7,17 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 10px; background-color: #f1f5f9; color: #1e293b; font-size: 14px; }
+        
+        /* 📱 すべてのボタンやタップ要素で、ダブルタップによるズームを禁止する */
+        button, input, select, .filter-toggle, .filter-item, .btn-category, .btn-calc {
+            touch-action: manipulation;
+        }
+
+        /* 💡 iOSのフォームズームを絶対に発生させないよう、16pxを最優先で強制 */
+        input, select, textarea {
+            font-size: 16px !important;
+        }
+
         .container { max-width: 650px; margin: 0 auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
         h1 { text-align: center; font-size: 19px; color: #0f172a; margin: 5px 0 15px 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 8px; }
         
@@ -14,16 +25,13 @@
         .meta-input-group { background: #fdfefe; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; display: flex; flex-direction: column; }
         .meta-row-date { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; font-size: 14px; width: 100%; }
         .meta-row-date label { font-weight: bold; color: #64748b; margin-right: 5px; }
-        
-        /* 💡 iOSでズームさせないために font-size: 16px に変更 */
-        .meta-row-date input { width: 140px; padding: 5px; font-size: 16px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; background-color: #f8fafc; }
+        .meta-row-date input { width: 140px; padding: 5px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; background-color: #f8fafc; }
         
         .meta-row-center { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; font-size: 14px; width: 100%; }
         .meta-row-center:last-child { margin-bottom: 0; }
         .meta-row-center label { font-weight: bold; color: #334155; margin-right: 8px; width: 80px; text-align: right; }
         
-        /* 💡 select と input の font-size を 16px に引き上げ */
-        .meta-row-center select, .meta-row-center input { width: 220px; padding: 6px 8px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 6px; background-color: white; font-weight: bold; }
+        .meta-row-center select, .meta-row-center input { width: 220px; padding: 6px 8px; border: 2px solid #cbd5e1; border-radius: 6px; background-color: white; font-weight: bold; }
         .meta-row-center input:disabled { background-color: #e2e8f0; color: #64748b; border-color: #cbd5e1; }
 
         /* 💾 各種ボタン配置 */
@@ -44,7 +52,6 @@
         .filter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         @media (max-width: 480px) { .filter-grid { grid-template-columns: repeat(2, 1fr); } }
         
-        /* 💡 フィルターのチェックボックス周りもタップしやすく調整 */
         .filter-item { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: bold; color: #475569; cursor: pointer; padding: 4px 2px; }
         .filter-item input { transform: scale(1.2); cursor: pointer; }
 
@@ -221,7 +228,6 @@
 </div>
 
 <script>
-    // 🌟 登録地と拠点コードのマスターデータを指定の表記に完全修正
     const locationMaster = {
         "丸広百貨店入間": "002036",
         "狭山市立博物館": "003557",
@@ -661,7 +667,7 @@
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-             oscillator.type = 'sine';
+            oscillator.type = 'sine';
             oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
             gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
             oscillator.connect(gainNode);
@@ -672,12 +678,10 @@
     }
 
     csvBtn.addEventListener('click', () => {
-        // 元の処理で切れていたCSV出力ロジックの補完
         const dateInput = document.getElementById('inputDate').value.replace(/-/g, '');
         const workerInput = document.getElementById('inputWorker').value;
         let csvContent = "data:text/csv;charset=utf-8,日付,登録地,拠点コード,作業者,カテゴリー,数量\n";
         
-        // プールされているデータを含めてCSV化
         const exportData = { ...allLocationsData };
         const currentLoc = document.getElementById('inputLocation').value;
         if (dataList.length > 0) {
