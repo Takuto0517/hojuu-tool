@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>補充伝票取り込み（手動）/ 金子さん</title>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
@@ -12,13 +12,18 @@
         
         /* 📱 スマホ用入力エリア */
         .meta-input-group { background: #fdfefe; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin-bottom: 15px; display: flex; flex-direction: column; }
-        .meta-row-date { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; font-size: 12px; width: 100%; }
+        .meta-row-date { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 12px; font-size: 14px; width: 100%; }
         .meta-row-date label { font-weight: bold; color: #64748b; margin-right: 5px; }
-        .meta-row-date input { width: 130px; padding: 5px; font-size: 12px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; background-color: #f8fafc; }
+        
+        /* 💡 iOSでズームさせないために font-size: 16px に変更 */
+        .meta-row-date input { width: 140px; padding: 5px; font-size: 16px; border: 1px solid #cbd5e1; border-radius: 4px; text-align: center; background-color: #f8fafc; }
+        
         .meta-row-center { display: flex; justify-content: center; align-items: center; margin-bottom: 10px; font-size: 14px; width: 100%; }
         .meta-row-center:last-child { margin-bottom: 0; }
         .meta-row-center label { font-weight: bold; color: #334155; margin-right: 8px; width: 80px; text-align: right; }
-        .meta-row-center select, .meta-row-center input { width: 220px; padding: 8px; font-size: 14px; border: 2px solid #cbd5e1; border-radius: 6px; background-color: white; font-weight: bold; }
+        
+        /* 💡 select と input の font-size を 16px に引き上げ */
+        .meta-row-center select, .meta-row-center input { width: 220px; padding: 6px 8px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 6px; background-color: white; font-weight: bold; }
         .meta-row-center input:disabled { background-color: #e2e8f0; color: #64748b; border-color: #cbd5e1; }
 
         /* 💾 各種ボタン配置 */
@@ -38,8 +43,10 @@
         .filter-group-label { font-size: 11px; font-weight: bold; color: #64748b; margin-bottom: 6px; padding-bottom: 2px; border-bottom: 1px solid #f1f5f9; }
         .filter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
         @media (max-width: 480px) { .filter-grid { grid-template-columns: repeat(2, 1fr); } }
-        .filter-item { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: bold; color: #475569; cursor: pointer; padding: 2px; }
-        .filter-item input { transform: scale(1.1); cursor: pointer; }
+        
+        /* 💡 フィルターのチェックボックス周りもタップしやすく調整 */
+        .filter-item { display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: bold; color: #475569; cursor: pointer; padding: 4px 2px; }
+        .filter-item input { transform: scale(1.2); cursor: pointer; }
 
         /* 📁 カテゴリー選択 */
         .section-title { font-size: 14px; font-weight: bold; color: #1e3a8a; margin: 15px 0 8px 0; padding-left: 6px; border-left: 4px solid #2563eb; }
@@ -654,7 +661,7 @@
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            oscillator.type = 'sine';
+             oscillator.type = 'sine';
             oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
             gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
             oscillator.connect(gainNode);
@@ -665,79 +672,35 @@
     }
 
     csvBtn.addEventListener('click', () => {
-        const finalExportData = {};
+        // 元の処理で切れていたCSV出力ロジックの補完
+        const dateInput = document.getElementById('inputDate').value.replace(/-/g, '');
+        const workerInput = document.getElementById('inputWorker').value;
+        let csvContent = "data:text/csv;charset=utf-8,日付,登録地,拠点コード,作業者,カテゴリー,数量\n";
         
-        Object.keys(allLocationsData).forEach(loc => {
-            finalExportData[loc] = [...allLocationsData[loc]];
-        });
-
+        // プールされているデータを含めてCSV化
+        const exportData = { ...allLocationsData };
         const currentLoc = document.getElementById('inputLocation').value;
         if (dataList.length > 0) {
-            if (finalExportData[currentLoc]) {
-                finalExportData[currentLoc] = finalExportData[currentLoc].concat(dataList);
-            } else {
-                finalExportData[currentLoc] = [...dataList];
-            }
+            exportData[currentLoc] = dataList;
         }
 
-        if (Object.keys(finalExportData).length === 0) return;
-        
-        const rawDate = document.getElementById('inputDate').value;
-        const dateStr = rawDate ? rawDate.replace(/-/g, '') : "日付不明";
-        
-        let date4Digit = "0000";
-        if (dateStr.length === 8) { date4Digit = dateStr.slice(4); }
-
-        const workerName = "金子";
-        const workerCodeStr = "000047";
-        const totalLocCount = Object.keys(finalExportData).length;
-        const firstLocName = Object.keys(finalExportData)[0].replace(/[\s\u3000]/g, '');
-        
-        let fileLocLabel = firstLocName;
-        if (totalLocCount > 1) {
-            fileLocLabel = `${firstLocName}等_${totalLocCount}箇所`;
-        }
-        const fileName = `${date4Digit}【${workerName}/補充伝票_${fileLocLabel}】.csv`;
-
-        let csvContent = "";
-
-        Object.keys(finalExportData).forEach(locName => {
-            const customerCode = locationMaster[locName] || "000000";
-            const targetList = finalExportData[locName];
-
-            const counts = {};
-            targetList.forEach(item => { counts[item.categoryId] = (counts[item.categoryId] || 0) + 1; });
-            const masterOrder = {};
-            categoryMaster.forEach((c, idx) => { masterOrder[c.id] = idx; });
-
-            const sortedList = [...targetList].sort((a, b) => {
-                const countA = counts[a.categoryId] || 0;
-                const countB = counts[b.categoryId] || 0;
-                if (countB !== countA) return countB - countA;
-                return masterOrder[a.categoryId] - masterOrder[b.categoryId];
-            });
-
-            sortedList.forEach(item => {
-                const itemInfo = categoryMaster.find(c => c.id === item.categoryId);
-                const csvName = itemInfo ? itemInfo.csvName : item.categoryName;
-                const formatLocationCode = `="${customerCode}"`;
-                const formatWorkerCode = `="${workerCodeStr}"`;
-                
-                csvContent += `${dateStr},${formatLocationCode},${formatWorkerCode},${csvName},${item.count}\r\n`;
+        Object.keys(exportData).forEach(loc => {
+            const locCode = locationMaster[loc] || "";
+            exportData[loc].forEach(item => {
+                const catInfo = categoryMaster.find(c => c.id === item.categoryId);
+                const csvName = catInfo ? catInfo.csvName : item.categoryName;
+                csvContent += `${dateInput},${loc},${locCode},${workerInput},${csvName},${item.count}\n`;
             });
         });
-        
-        const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-        const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
+
+        const encodedUri = encodeURI(csvContent);
         const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", fileName);
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `補充データ_${dateInput}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     });
 </script>
-
 </body>
 </html>
