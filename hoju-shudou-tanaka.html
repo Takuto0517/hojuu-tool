@@ -68,7 +68,7 @@
         .btn-calc.lot:active { background: #dbeafe; }
         .btn-calc.ok { grid-row: span 2; display: flex; align-items: center; justify-content: center; background: #ef4444; color: white; border-color: #dc2626; font-size: 18px; }
         .btn-calc.ok:active { background: #dc2626; }
-        .lot-container { grid-column: span 3; display: flex; gap: 6px; }
+        .lot-container { grid-column: span 4; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 
         /* 📋 テーブル・入力履歴 */
         table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; background: white; table-layout: fixed; }
@@ -192,7 +192,7 @@
         <button class="btn-calc" onclick="pressNum('1')">1</button>
         <button class="btn-calc" onclick="pressNum('2')">2</button>
         <button class="btn-calc" onclick="pressNum('3')">3</button>
-        <button class="btn-calc ok" onclick="pressAction('OK')">OK<br>確定</button>
+        <button class="btn-calc ok" onclick="pressAction('OK')">OK確定</button>
 
         <button class="btn-calc" style="grid-column: span 2;" onclick="pressNum('0')">0</button>
         <button class="btn-calc action" style="font-size: 22px;" onclick="toggleMinus()">ー</button>
@@ -200,6 +200,7 @@
         <div class="lot-container">
             <button class="btn-calc lot" onclick="pressLot('20')">20</button>
             <button class="btn-calc lot" onclick="pressLot('30')">30</button>
+            <button class="btn-calc lot" onclick="pressLot('40')">40</button>
         </div>
     </div>
 
@@ -720,7 +721,6 @@
         let date4Digit = "0000";
         if (dateStr.length === 8) { date4Digit = dateStr.slice(4); }
 
-        // 作業者情報を田中に書き換え
         const workerName = "田中";
         const workerCodeStr = "000061";
         const totalLocCount = Object.keys(finalExportData).length;
@@ -754,7 +754,7 @@
                 const itemInfo = categoryMaster.find(c => c.id === item.categoryId);
                 const csvName = itemInfo ? itemInfo.csvName : item.categoryName;
                 const formatLocationCode = `="${customerCode}"`;
-                const formatWorkerCode = `="${workerCodeStr}"`; // 田中の作業者コード（"000061"）
+                const formatWorkerCode = `="${workerCodeStr}"`;
                 
                 csvContent += `${dateStr},${formatLocationCode},${formatWorkerCode},${csvName},${item.count}\r\n`;
             });
