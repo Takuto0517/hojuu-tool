@@ -68,7 +68,7 @@
         .btn-calc.lot:active { background: #dbeafe; }
         .btn-calc.ok { grid-row: span 2; display: flex; align-items: center; justify-content: center; background: #ef4444; color: white; border-color: #dc2626; font-size: 18px; }
         .btn-calc.ok:active { background: #dc2626; }
-        .lot-container { grid-column: span 3; display: flex; gap: 6px; }
+        .lot-container { grid-column: span 4; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 
         /* 📋 テーブル・入力履歴 */
         table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 13px; background: white; table-layout: fixed; }
@@ -163,7 +163,7 @@
         <button class="btn-calc" onclick="pressNum('1')">1</button>
         <button class="btn-calc" onclick="pressNum('2')">2</button>
         <button class="btn-calc" onclick="pressNum('3')">3</button>
-        <button class="btn-calc ok" onclick="pressAction('OK')">OK<br>確定</button>
+        <button class="btn-calc ok" onclick="pressAction('OK')">OK確定</button>
 
         <button class="btn-calc" style="grid-column: span 2;" onclick="pressNum('0')">0</button>
         <button class="btn-calc action" style="font-size: 22px;" onclick="toggleMinus()">ー</button>
@@ -171,6 +171,7 @@
         <div class="lot-container">
             <button class="btn-calc lot" onclick="pressLot('20')">20</button>
             <button class="btn-calc lot" onclick="pressLot('30')">30</button>
+            <button class="btn-calc lot" onclick="pressLot('40')">40</button>
         </div>
     </div>
 
@@ -695,7 +696,7 @@
             sortedList.forEach(item => {
                 const itemInfo = categoryMaster.find(c => c.id === item.categoryId);
                 const csvName = itemInfo ? itemInfo.csvName : item.categoryName;
-                const formatLocationCode = `="${customerCode}"`;
+                const formatLocationCode = `=".${customerCode}"`;
                 const formatWorkerCode = `="${workerCodeStr}"`;
                 
                 csvContent += `${dateStr},${formatLocationCode},${formatWorkerCode},${csvName},${item.count}\r\n`;
