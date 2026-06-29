@@ -117,7 +117,7 @@
 <body>
 
 <div class="container">
-    <h1>売上精算書集計補助（+消費税表記）</h1>
+    <h1>売上精算書集計補助</h1>
 
     <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-bottom: 15px;">
         <button id="stepNav-0" onclick="jumpToDept(0)" class="step-btn btn-empty">①</button>
@@ -159,8 +159,9 @@
         <tbody id="denomTable"></tbody>
     </table>
 
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
-        <button class="btn-block" id="nextStepBtn" style="width: 50%; background:#2563eb; color:white; font-size:15px; margin-bottom:0; padding: 12px;" onclick="goToNextStep()">次の項目へ（②）➔</button>
+    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+        <button class="btn-block" id="prevStepBtn" style="width: 50%; background:#64748b; color:white; font-size:15px; margin-bottom:0; padding: 12px; display: none;" onclick="goToPrevStep()">⬅ 前の項目へ</button>
+        <button class="btn-block" id="nextStepBtn" style="width: 100%; background:#2563eb; color:white; font-size:15px; margin-bottom:0; padding: 12px;" onclick="goToNextStep()">次の項目へ（②）➔</button>
     </div>
     
     <button class="btn-block" id="finalizeBtn" style="background: #10b981; color: white; background-image: linear-gradient(to bottom, #10b981, #059669);" onclick="scrollToSummary()">➔ 入力を完了して確定</button>
@@ -488,6 +489,17 @@
         });
     }
 
+    // 現在の入力画面（項目）に数値が入力されているか判定する共通関数
+    function checkCurrentDeptInput() {
+        const currentDeptId = departments[currentDeptIndex].id;
+        const currentData = deptData[currentDeptId];
+        let hasInput = false;
+        if (currentData && currentData.counts) {
+            hasInput = Object.values(currentData.counts).some(count => count > 0);
+        }
+        return hasInput;
+    }
+
     function updateLiveReports() {
         const deptRowsTbody = document.getElementById('reportDeptRows');
         if (!deptRowsTbody) return;
@@ -674,29 +686,76 @@
             document.getElementById(`amount-${d.value}`).innerText = "¥" + amt.toLocaleString();
         });
         
+        // 🔄 ナビゲーションボタンの動的制御
+        const prevStepBtn = document.getElementById('prevStepBtn');
         const nextStepBtn = document.getElementById('nextStepBtn');
+
+        if (currentDeptIndex === 0) {
+            // ①の時は前の項目に戻るボタンを非表示にし、進むボタンを横幅100%にする
+            prevStepBtn.style.display = 'none';
+            nextStepBtn.style.width = '100%';
+        } else {
+            // ②〜⑥の時は戻るボタンを表示し、均等に50%ずつ配置する
+            prevStepBtn.style.display = 'block';
+            prevStepBtn.style.width = '50%';
+            nextStepBtn.style.width = '50%';
+            
+            const prevDept = departments[currentDeptIndex - 1];
+            prevStepBtn.innerText = `⬅ 前の項目へ（${prevDept.name}）`;
+        }
+
+        // 次に進むボタンのテキスト制御
         if (currentDeptIndex === departments.length - 1) {
             nextStepBtn.innerText = `最初の項目へ（${departments[0].name}）🔄`;
-            nextStepBtn.style.background = "#64748b";
         } else {
             const nextDept = departments[currentDeptIndex + 1];
             nextStepBtn.innerText = `次の項目へ（${nextDept.name}）➔`;
-            nextStepBtn.style.background = "#2563eb";
         }
     }
 
     function jumpToDept(index) {
+        if (currentDeptIndex === index) return;
+
+        // 現在の項目に入力があるかチェック
+        if (!checkCurrentDeptInput()) {
+            const currentDept = departments[currentDeptIndex];
+            alert(`現在の項目（${currentDept.name}）の金種（枚数）が入力されていません。他の項目へ移る前に数値を入力してください。`);
+            return;
+        }
+
         currentDeptIndex = index;
         loadCurrentDeptToUI();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function goToNextStep() {
+        // 現在の項目に入力があるかチェック
+        if (!checkCurrentDeptInput()) {
+            const currentDept = departments[currentDeptIndex];
+            alert(`現在の項目（${currentDept.name}）の金種（枚数）が入力されていません。次の項目へ進む前に数値を入力してください。`);
+            return;
+        }
+
         if (currentDeptIndex === departments.length - 1) {
             currentDeptIndex = 0;
         } else {
             currentDeptIndex++;
         }
+        loadCurrentDeptToUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function goToPrevStep() {
+        if (currentDeptIndex === 0) return; // 安全策
+
+        // 現在の項目に入力があるかチェック
+        if (!checkCurrentDeptInput()) {
+            const currentDept = departments[currentDeptIndex];
+            alert(`現在の項目（${currentDept.name}）の金種（枚数）が入力されていません。前の項目へ戻る前に数値を入力してください。`);
+            return;
+        }
+
+        currentDeptIndex--;
         loadCurrentDeptToUI();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
