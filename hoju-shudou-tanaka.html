@@ -92,7 +92,7 @@
 <body>
 
 <div class="container">
-    <h1>補充伝票取り込み（手動）/ 田中さん</h1>
+    <h1>補充伝伝票取り込み（手動）/ 田中さん</h1>
 
     <div class="meta-input-group">
         <div class="meta-row-date">
@@ -111,7 +111,9 @@
                 <option value="すばる書店二十世紀が丘">すばる書店二十世紀が丘</option>
                 <option value="すばる書店六高台">すばる書店六高台</option>
                 <option value="すばる書店鎌ヶ谷">すばる書店鎌ヶ谷</option>
-                <option value="房総のむら">房総のむら</option>
+                <option value="房総のむら（総屋）">房総のむら（総屋）</option>
+                <option value="房総のむら（資料館）">房総のむら（資料館）</option>
+                
                 <option value="大慶園">大慶園</option>
                 <option value="茨城鑑定団 神栖">茨城鑑定団 神栖</option>
                 <option value="島忠ﾎｰﾑｽﾞ三郷中央">島忠ﾎｰﾑｽﾞ三郷中央</option>
@@ -231,7 +233,7 @@
 </div>
 
 <script>
-    // 🌟 登録地と拠点コードのマスターデータを田中のリストに完全刷新
+    // 🌟 登録地と拠点コードのマスターデータ（2店舗とも同じ 004823 に紐付け）
     const locationMaster = {
         "ｲｴﾛｰｻﾌﾞﾏﾘﾝ柏": "003163",
         "ﾂﾀﾔ そよら成田ﾆｭｰﾀｳﾝ": "003694",
@@ -242,7 +244,9 @@
         "すばる書店二十世紀が丘": "004264",
         "すばる書店六高台": "004265",
         "すばる書店鎌ヶ谷": "004266",
-        "房総のむら": "004823",
+        "房総のむら（総屋）": "004823",
+        "房総のむら（資料館）": "004823",
+        
         "大慶園": "004846",
         "茨城鑑定団 神栖": "005401",
         "島忠ﾎｰﾑｽﾞ三郷中央": "016317",
@@ -326,7 +330,6 @@
         if (savedAllData) allLocationsData = JSON.parse(savedAllData);
         if (savedLocation && locationMaster[savedLocation]) document.getElementById('inputLocation').value = savedLocation;
         if (savedDate) document.getElementById('inputDate').value = savedDate;
-
         if (savedFilter) {
             visibleCategories = JSON.parse(savedFilter);
         } else {
@@ -360,7 +363,6 @@
         const container = document.getElementById('filterOptions');
         container.innerHTML = "";
         const groups = ["carddas", "capsule", "vag", "cardgame"];
-        
         groups.forEach(grp => {
             const grpItems = categoryMaster.filter(c => c.group === grp);
             if(grpItems.length === 0) return;
@@ -445,7 +447,6 @@
     }
 
     saveBtn.addEventListener('click', () => saveToStorage(true));
-
     clearBtn.addEventListener('click', () => {
         if (confirm("現在の画面の入力データをクリアします。よろしいですか？")) {
             resetCurrentView();
@@ -640,7 +641,6 @@
 
     function renderTable() {
         dataTable.innerHTML = "";
-
         categoryMaster.forEach((cat) => {
             const catItems = dataList.filter(item => item.categoryId === cat.id);
             
@@ -733,7 +733,6 @@
         const fileName = `${date4Digit}【${workerName}/補充伝票_${fileLocLabel}】.csv`;
 
         let csvContent = "";
-
         Object.keys(finalExportData).forEach(locName => {
             const customerCode = locationMaster[locName] || "000000";
             const targetList = finalExportData[locName];
