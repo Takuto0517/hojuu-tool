@@ -31,9 +31,9 @@
             padding-bottom: 60px;
         }
         h1 {
-            font-size: 20px;
+            font-size: 18px;
             text-align: center;
-            margin: 10px 0 24px 0;
+            margin: 10px 0 20px 0;
             color: #0f172a;
             font-weight: 800;
             letter-spacing: 0.5px;
@@ -41,13 +41,13 @@
         .card {
             background: #fff;
             border-radius: 12px;
-            padding: 18px;
+            padding: 14px;
             margin-bottom: 16px;
             box-shadow: 0 4px 12px rgba(15,23,42,0.04);
             border: 1px solid #e2e8f0;
         }
         .section-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             color: #334155;
             margin: 24px 0 10px 4px;
@@ -61,14 +61,14 @@
             background: #fff;
             border: 1px solid var(--ss-border);
             border-radius: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             box-shadow: 0 4px 10px rgba(0,82,204,0.04);
             overflow: hidden;
         }
         .ss-accordion-header {
-            padding: 16px;
+            padding: 14px;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
             color: var(--ss-blue);
             display: flex;
             justify-content: space-between;
@@ -78,44 +78,44 @@
             background: var(--ss-blue-light);
         }
         .ss-accordion-content {
-            padding: 4px 16px 16px 16px;
+            padding: 4px 14px 14px 14px;
             background: #fff;
         }
         
         .ss-group-box {
             border: 1px solid #cbd5e1;
             border-radius: 10px;
-            padding: 14px;
-            margin-top: 14px;
+            padding: 12px;
+            margin-top: 12px;
             background: #fff;
         }
         .ss-group-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
             color: #475569;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             border-bottom: 2px solid #f1f5f9;
             padding-bottom: 6px;
         }
         
         .ss-checkbox-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
         }
         .ss-checkbox-label {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 14px;
+            gap: 8px;
+            font-size: 13px;
             font-weight: 700;
             color: #334155;
             cursor: pointer;
             padding: 4px 0;
         }
         .ss-checkbox-label input[type="checkbox"] {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             accent-color: var(--ss-blue);
             cursor: pointer;
         }
@@ -126,8 +126,8 @@
             border-radius: 12px;
             overflow: hidden;
             border: 2px solid #cbd5e1;
-            margin-bottom: 18px;
-            height: 56px;
+            margin-bottom: 16px;
+            height: 50px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.03);
         }
         .group-btn {
@@ -135,7 +135,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 800;
             background: #fff;
             color: #64748b;
@@ -152,61 +152,148 @@
             color: #fff;
         }
 
-        /* 入力フォーム共通 */
+        /* 入力フォーム設定 */
         select {
-            width: 100%; height: 46px; border: 2px solid #cbd5e1; border-radius: 8px;
-            padding: 0 12px; font-size: 16px; font-weight: 600; outline: none; background: #fff;
+            width: 100%;
+            height: 44px;
+            border: 2px solid var(--ss-blue);
+            border-radius: 8px;
+            padding: 0 10px;
+            font-size: 15px;
+            font-weight: 700;
+            outline: none;
+            background: #fff;
+            color: #0f172a;
         }
-        select:focus { border-color: var(--ss-blue); background-color: var(--ss-blue-light); }
+        select:focus {
+            background-color: var(--ss-blue-light);
+        }
+        
+        /* ★金種窓をコンパクトにし、右寄せ（テキストも右寄せ） */
         input[type="number"] {
-            width: 100%; height: 46px; border: 2px solid #cbd5e1; border-radius: 8px;
-            font-size: 17px; font-weight: 700; text-align: right; padding: 0 10px; outline: none; -moz-appearance: textfield;
+            width: 85px; 
+            height: 38px;
+            border: 1px solid #94a3b8;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 700;
+            text-align: right;
+            padding: 0 8px;
+            outline: none;
+            background-color: #ffffff;
+            color: #0f172a;
+            -moz-appearance: textfield;
         }
-        input[type="number"]:focus { border-color: var(--ss-blue); background-color: var(--ss-blue-light); }
-        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"]:focus {
+            border: 2px solid var(--ss-blue);
+            background-color: var(--ss-blue-light);
+        }
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
 
-        /* 入力明細行 */
-        .item-row { border-bottom: 2px dashed #cbd5e1; padding-bottom: 16px; margin-bottom: 16px; }
-        .item-row:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
-        .denoms-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-        .denom-field { flex: 1; min-width: 85px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; text-align: center; }
-        .denom-field span { font-size: 12px; font-weight: 800; color: #475569; display: block; margin-bottom: 6px; }
-        .row-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-        .row-total-lbl { font-size: 15px; font-weight: 800; color: var(--ss-blue); }
+        /* 入力明細行レイアウト */
+        .item-row {
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 14px;
+            margin-bottom: 14px;
+        }
+        .item-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+        
+        /* 上段（ドロップダウン＋削除ボタン） */
+        .row-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        /* 下段：金種コンテナ（縦並びのリスト形式にして右側に入力窓を配置） */
+        .denoms-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 8px;
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            max-width: 240px; /* 横に広がりすぎないサイズ */
+        }
+        
+        /* ★左側にレーベル、右側に入力窓を配置するスタイル */
+        .denom-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .denom-field span {
+            font-size: 13px;
+            font-weight: 800;
+            color: #475569;
+        }
+        .row-total-lbl {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--ss-blue);
+        }
 
         /* ボタン */
-        .btn { display: flex; align-items: center; justify-content: center; height: 48px; border-radius: 8px; font-size: 16px; font-weight: 700; border: none; cursor: pointer; width: 100%; }
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 44px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
         .btn:active { opacity: 0.8; }
-        .btn-primary { background-color: var(--ss-blue); color: #fff; }
-        .btn-secondary { background-color: #f1f5f9; color: #334155; border: 2px solid #cbd5e1; margin-top: 8px; }
-        .btn-danger { background-color: #ef4444; color: #fff; height: 38px; width: auto; padding: 0 14px; font-size: 14px; border-radius: 6px; }
-        .btn-success { background-color: #10b981; color: #fff; font-size: 18px; height: 56px; margin-top: 28px; box-shadow: 0 4px 14px rgba(16,185,129,0.3); }
+        .btn-secondary { background-color: #f1f5f9; color: #334155; border: 2px solid #cbd5e1; margin-top: 6px; }
+        .btn-danger { background-color: #ef4444; color: #fff; height: 38px; width: auto; padding: 0 14px; font-size: 14px; border-radius: 6px; display: inline-flex; }
+        .btn-success { background-color: #10b981; color: #fff; font-size: 16px; height: 50px; margin-top: 24px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
 
-        .landscape-alert { background: #fef08a; color: #854d0e; text-align: center; padding: 12px; font-size: 13px; font-weight: bold; border-radius: 8px; margin-bottom: 16px; border: 1px solid #fde047; }
-        @media screen and (min-width: 768px) { .landscape-alert { display: none; } }
+        .landscape-alert { background: #eff6ff; color: #1e40af; text-align: center; padding: 10px; font-size: 12px; font-weight: bold; border-radius: 8px; margin-bottom: 14px; border: 1px solid #bfdbfe; }
 
-        /* ----------------------------------------------------
-           プレビュー画面のレイアウト
-        ---------------------------------------------------- */
+        /* プレビュー表示エリア（iPhone縦画面見切れ対策） */
+        .table-scroll-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 20px;
+            border: 1px solid #000;
+        }
+        
         #print-preview {
             background: #fff;
             color: #000;
-            padding: 26px;
-            margin-top: 20px;
+            padding: 16px;
+            margin-top: 14px;
             border: 3px solid #000;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
+        
         .report-header-layout {
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .store-badge-preview {
             display: inline-block;
-            padding: 5px 16px;
-            font-size: 15px;
+            padding: 4px 12px;
+            font-size: 13px;
             font-weight: 900;
             color: #fff;
             border-radius: 4px;
@@ -216,35 +303,34 @@
         .store-badge-preview.beisia { background-color: var(--beisia-red); }
 
         .preview-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             text-align: center;
-            letter-spacing: 4px;
+            letter-spacing: 2px;
             border-bottom: 3px double #000;
-            padding-bottom: 6px;
-            margin-bottom: 24px;
+            padding-bottom: 4px;
+            margin-bottom: 20px;
         }
         
         .report-table {
             width: 100%;
+            min-width: 620px;
             border-collapse: collapse;
-            font-size: 14px;
-            margin-bottom: 24px;
+            font-size: 13px;
             table-layout: fixed;
         }
         .report-table th, .report-table td {
             border: 1px solid #000;
-            padding: 10px 4px;
+            padding: 8px 4px;
             text-align: center;
             white-space: nowrap;
-            overflow: hidden;
         }
         .report-table th {
             background-color: #f2f2f2;
             font-weight: bold;
         }
-        .text-left { text-align: left !important; padding-left: 8px !important; }
-        .text-right { text-align: right !important; padding-right: 8px !important; }
+        .text-left { text-align: left !important; padding-left: 6px !important; }
+        .text-right { text-align: right !important; padding-right: 6px !important; }
 
         .td-code-grid {
             padding: 0 !important;
@@ -254,14 +340,14 @@
             display: flex;
             width: 100%;
             height: 100%;
-            min-height: 36px;
+            min-height: 32px;
             align-items: center;
         }
         .code-grid-char {
             flex: 1;
             text-align: center;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
             font-family: monospace;
             border-right: 1px solid #000;
             height: 100%;
@@ -274,33 +360,35 @@
         }
 
         .denom-vertical-table {
-            max-width: 400px;
-            margin-bottom: 24px;
+            width: 100%;
+            max-width: 360px;
+            min-width: 0;
+            margin-bottom: 20px;
         }
         
         .remarks-wrapper {
-            margin-top: 16px;
+            margin-top: 14px;
         }
         .remarks-box {
             border: 1px solid #000;
-            padding: 12px;
-            min-height: 90px;
-            font-size: 13px;
+            padding: 10px;
+            min-height: 80px;
+            font-size: 12px;
             white-space: pre-wrap;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         @media print {
             body * { display: none; }
             #print-preview, #print-preview * { display: block; }
             #print-preview { display: block !important; border: none; padding: 0; margin: 0; }
+            .table-scroll-container { border: none; overflow-x: visible; }
+            .report-table { min-width: 100% !important; width: 100% !important; table-layout: fixed !important; }
             .report-header-layout { display: flex !important; }
-            .report-table { display: table !important; width: 100% !important; }
             .report-table th, .report-table td { display: table-cell !important; }
             .td-code-grid { display: table-cell !important; padding: 0 !important; }
             .code-grid-container { display: flex !important; }
             .code-grid-char { display: flex !important; }
-            .denom-vertical-table { max-width: 100% !important; }
         }
     </style>
 </head>
@@ -310,7 +398,7 @@
     <h1>ミュー専用売上報告書計算ツール</h1>
 
     <div class="landscape-alert">
-        💡 iPhoneを横向きに回転させると、プレビューが出力用紙幅でさらに見やすくなります。
+        💡 プレビュー表は見切れる場合、指で左右にスライド（スクロール）して確認できます。
     </div>
 
     <!-- 店舗切り替え -->
@@ -323,11 +411,11 @@
     <!-- 金種表示設定 -->
     <div class="ss-accordion">
         <div class="ss-accordion-header" onclick="toggleSSAccordion('acc-denom', 'arrow-denom')">
-            <span>🔍 表示する金種を選択（クリックで展開/格納）</span>
+            <span>🔍 表示する金種を選択</span>
             <span id="arrow-denom">▲</span>
         </div>
         <div class="ss-accordion-content" id="acc-denom">
-            <div class="ss-checkbox-grid" style="margin-top: 12px;">
+            <div class="ss-checkbox-grid" style="margin-top: 10px;">
                 <label class="ss-checkbox-label"><input type="checkbox" id="chk-v10000" checked onchange="toggleDenomVisibility()"> 10,000円</label>
                 <label class="ss-checkbox-label"><input type="checkbox" id="chk-v1000" checked onchange="toggleDenomVisibility()"> 1,000円</label>
                 <label class="ss-checkbox-label"><input type="checkbox" id="chk-v500" checked onchange="toggleDenomVisibility()"> 500円</label>
@@ -339,7 +427,7 @@
     <!-- ジャンル別アイテムフィルター設定 -->
     <div class="ss-accordion">
         <div class="ss-accordion-header" onclick="toggleSSAccordion('acc-genre', 'arrow-genre')">
-            <span>🔍 表示するカテゴリーを選択（クリックで展開/格納）</span>
+            <span>🔍 表示するカテゴリーを選択</span>
             <span id="arrow-genre">▲</span>
         </div>
         <div class="ss-accordion-content" id="acc-genre">
@@ -357,11 +445,10 @@
     <!-- ----------------------------------------------------
        報告書プレビュー表示エリア
     ---------------------------------------------------- -->
-    <div class="section-title" id="preview-section-title">📊 報告書プレビュー (リアルタイム連動中)</div>
+    <div class="section-title" id="preview-section-title">📊 報告書プレビュー</div>
     
-    <!-- プレビュー枠（印刷対象） -->
+    <!-- プレビュー枠 -->
     <div id="print-preview">
-        <!-- 上部ヘッダー（バッジのみ表示） -->
         <div class="report-header-layout">
             <div>
                 <span id="p-active-store-badge" class="store-badge-preview cainz">カインズ</span>
@@ -371,25 +458,27 @@
         <div class="preview-title">ミュー専用売上金報告書</div>
 
         <!-- 【上部】売上明細テーブル -->
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">【売上明細内訳】</div>
-        <table class="report-table">
-            <thead>
-                <tr>
-                    <th style="width: 6%;">No</th>
-                    <th style="width: 35%;">ジャンル名</th>
-                    <th style="width: 17%;">売上送信コード</th>
-                    <th style="width: 14%;">集金額(税込)</th>
-                    <th style="width: 14%;">売上金(税抜)</th>
-                    <th style="width: 14%;">消費税</th>
-                </tr>
-            </thead>
-            <tbody id="p-main-tbody">
-                <!-- JavaScriptにより生成 -->
-            </tbody>
-        </table>
+        <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">【売上明細内訳】（← 横スクロール可能）</div>
+        <div class="table-scroll-container">
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th style="width: 6%;">No</th>
+                        <th style="width: 35%;">ジャンル名</th>
+                        <th style="width: 17%;">売上送信コード</th>
+                        <th style="width: 14%;">集金額(税込)</th>
+                        <th style="width: 14%;">売上金(税抜)</th>
+                        <th style="width: 14%;">消費税</th>
+                    </tr>
+                </thead>
+                <tbody id="p-main-tbody">
+                    <!-- JavaScriptにより生成 -->
+                </tbody>
+            </table>
+        </div>
 
         <!-- 【下部】金種別現金残高テーブル -->
-        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">【金種別現金残高】</div>
+        <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">【金種別現金残高】</div>
         <table class="report-table denom-vertical-table">
             <thead>
                 <tr>
@@ -429,14 +518,14 @@
 
         <!-- 最下部：備考欄 -->
         <div class="remarks-wrapper">
-            <div style="font-size:12px; font-weight:bold; margin-bottom:6px;">（備考欄）内訳別アイテム詳細:</div>
+            <div style="font-size:11px; font-weight:bold; margin-bottom:6px;">（備考欄）内訳別アイテム詳細:</div>
             <div class="remarks-box" id="p-remarks"></div>
         </div>
     </div>
 
-    <!-- リセットボタンをプレビューの枠の外側（直下）に配置 -->
+    <!-- リセットボタン（外側） -->
     <div style="margin-top: 20px; text-align: center;">
-        <button class="btn btn-danger" style="width:auto; display:inline-flex; padding:0 36px; height:50px; font-size:16px;" onclick="resetInputFields()">🔄 入力内容をすべてリセット</button>
+        <button class="btn btn-danger" style="width:auto; display:inline-flex; padding:0 30px; height:46px; font-size:15px;" onclick="resetInputFields()">🔄 入力内容をすべてリセット</button>
     </div>
 </div>
 
@@ -466,11 +555,9 @@
         processCalculations();
     }
 
-    // カテゴリー・金種設定を引き継ぐリセット処理
     function resetInputFields() {
         if(!confirm("内訳と枚数入力をすべてクリアします。よろしいですか？\n(※カテゴリーや金種の表示設定は維持されます)")) return;
         initDefaultRows();
-        // 画面最上部へスムーズにスクロール
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -543,7 +630,7 @@
         const denoms = ['10000', '1000', '500', '100'];
         denoms.forEach(d => {
             const isChecked = document.getElementById(`chk-v${d}`).checked;
-            document.querySelectorAll(`.df-${d}`).forEach(el => el.style.display = isChecked ? 'block' : 'none');
+            document.querySelectorAll(`.df-${d}`).forEach(el => el.style.display = isChecked ? 'flex' : 'none'); // flexにして左右に並べる
         });
         processCalculations();
     }
@@ -557,7 +644,9 @@
                 <div style="flex:1;">
                     <select class="row-item-select" onchange="calculateRowAmt(this)"></select>
                 </div>
-                <button class="btn btn-danger" onclick="removeRow(this)">削除</button>
+                <div>
+                    <button class="btn btn-danger" onclick="removeRow(this)">削除</button>
+                </div>
             </div>
             <div class="denoms-container">
                 <div class="denom-field df-10000"><span>10,000円</span><input type="number" class="input-d10000" placeholder="0" oninput="calculateRowAmt(this)"></div>
@@ -565,7 +654,7 @@
                 <div class="denom-field df-500"><span>500円</span><input type="number" class="input-d500" placeholder="0" oninput="calculateRowAmt(this)"></div>
                 <div class="denom-field df-100"><span>100円</span><input type="number" class="input-d100" placeholder="0" oninput="calculateRowAmt(this)"></div>
             </div>
-            <div style="text-align:right; margin-top:6px;">
+            <div style="text-align:right; margin-top:8px;">
                 <span class="row-total-lbl">小計: ¥<span class="row-total-val">0</span></span>
             </div>
         `;
@@ -631,7 +720,10 @@
             const n500 = parseInt(row.querySelector('.input-d500').value) || 0;
             const n100 = parseInt(row.querySelector('.input-d100').value) || 0;
 
-            c[10000] += n10000; c[1000] += n1000; c[500] += n500; c[100] += n100;
+            c[10000] += n10000; 
+            c[1000] += n1000; 
+            c[500] += n500; 
+            c[100] += n100;
 
             const rowSum = (n10000*10000)+(n1000*1000)+(n500*500)+(n100*100);
             genreSummary[genreId].inclusive += rowSum;
@@ -682,7 +774,7 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${printedRowCount}</td>
-                <td class="text-left" style="font-weight: bold; font-size:13px;">${genre.name}</td>
+                <td class="text-left" style="font-weight: bold; font-size:12px;">${genre.name}</td>
                 <td class="td-code-grid">${generateCodeGridHTML(code)}</td>
                 <td class="text-right">${data.inclusive > 0 ? data.inclusive.toLocaleString() : '0'}</td>
                 <td class="text-right">${data.inclusive > 0 ? taxExc.toLocaleString() : '0'}</td>
@@ -705,7 +797,7 @@
         document.getElementById('p-remarks').innerText = remarksArr.length > 0 ? remarksArr.join('\n') : '特記事項なし';
 
         if(isExplicitLock) {
-            document.getElementById('print-preview').scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('preview-section-title').scrollIntoView({ behavior: 'smooth' });
         }
     }
 </script>
