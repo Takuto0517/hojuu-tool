@@ -369,9 +369,7 @@
             border-right: none;
         }
 
-        /* ----------------------------------------------------
-           通常画面（スマホ縦画面用）：3段の縦積みレイアウト
-        ---------------------------------------------------- */
+        /* 通常画面（スマホ縦画面用）：3段の縦積みレイアウト */
         .preview-bottom-layout {
             display: flex;
             flex-direction: column;
@@ -384,7 +382,7 @@
         }
         .denom-vertical-table {
             width: 100%;
-            min-width: auto !important; /* ★追加：スマホ画面幅に収まるよう制限を解除 */
+            min-width: auto !important;
         }
         .bottom-right-block {
             width: 100%;
@@ -400,9 +398,7 @@
             width: 100%;
         }
 
-        /* ----------------------------------------------------
-           全体プレビュー（モーダル全画面用）：横並び（比率 3:7）
-        ---------------------------------------------------- */
+        /* 全体プレビュー（モーダル全画面用） */
         .fullscreen-overlay {
             display: none;
             position: fixed;
@@ -438,19 +434,19 @@
         .modal-scroll-area {
             flex: 1;
             width: 100%;
-            overflow: auto; 
+            overflow: auto; /* ★縦・横両方向のスクロールを有効化 */
             -webkit-overflow-scrolling: touch;
             background: #fff;
             border-radius: 8px;
             padding: 16px;
         }
 
-        /* モーダル表示時に強制適用させるスタイル（重なり・潰れバグを完全防止） */
+        /* モーダル表示時に強制適用させるスタイル */
         .modal-scroll-area #print-preview {
             border: none !important;
             margin-top: 0 !important;
             padding: 0 !important;
-            width: 750px; /* PC・A4印刷の標準幅に完全固定 */
+            width: 750px; /* ★スマホ縦画面時でも、強制的にPDF/PCと同等の750px幅を維持（潰れ防止） */
         }
         .modal-scroll-area .btn-preview-mode {
             display: none !important;
@@ -463,7 +459,7 @@
             width: 100% !important;
         }
         
-        /* ★モーダル内限定で「金種3：備考7」の横並びを絶対維持 */
+        /* モーダル内限定で「金種3：備考7」の横並びを絶対維持 */
         .modal-scroll-area .preview-bottom-layout {
             display: flex !important;
             flex-direction: row !important;
@@ -472,17 +468,14 @@
         }
         .modal-scroll-area .bottom-left-block {
             flex: 0 0 30% !important;
-            /* 幅30%を完全に固定 */
             width: 30% !important;
         }
         .modal-scroll-area .bottom-right-block {
             flex: 0 0 68% !important;
-            /* 幅68%を完全に固定（被り回避の2%マージン） */
             width: 68% !important;
         }
         .modal-scroll-area .remarks-box {
             min-height: 148px;
-            /* 金種表の高さとバランスを取る */
         }
 
         /* 印刷時の用紙レイアウト設定 */
@@ -494,10 +487,9 @@
             .table-scroll-container { border: none; overflow-x: visible; }
             .report-table { width: 100% !important; table-layout: fixed !important; }
             
-            /* 印刷時も「金種3：備考7」の横並びを適用 */
             .preview-bottom-layout { display: flex !important; flex-direction: row !important; justify-content: space-between !important; }
             .bottom-left-block { display: block !important; width: 30% !important; flex: 0 0 30% !important; }
-            .denom-vertical-table { display: table !important; width: 100% !important; min-width: auto !important; } /* ★追加 */
+            .denom-vertical-table { display: table !important; width: 100% !important; min-width: auto !important; }
             .bottom-right-block { display: block !important; width: 68% !important; flex: 0 0 68% !important; }
             .remarks-box { display: block !important; }
             
