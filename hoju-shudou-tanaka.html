@@ -92,7 +92,7 @@
 <body>
 
 <div class="container">
-    <h1>補充伝伝票取り込み（手動）/ 田中さん</h1>
+    <h1>補充伝票取り込み（手動）/ 田中さん</h1>
 
     <div class="meta-input-group">
         <div class="meta-row-date">
@@ -113,7 +113,6 @@
                 <option value="すばる書店鎌ヶ谷">すばる書店鎌ヶ谷</option>
                 <option value="房総のむら（総屋）">房総のむら（総屋）</option>
                 <option value="房総のむら（資料館）">房総のむら（資料館）</option>
-                
                 <option value="大慶園">大慶園</option>
                 <option value="茨城鑑定団 神栖">茨城鑑定団 神栖</option>
                 <option value="島忠ﾎｰﾑｽﾞ三郷中央">島忠ﾎｰﾑｽﾞ三郷中央</option>
@@ -233,7 +232,7 @@
 </div>
 
 <script>
-    // 🌟 登録地と拠点コードのマスターデータ（2店舗とも同じ 004823 に紐付け）
+    // 登録地と拠点コードのマスターデータ
     const locationMaster = {
         "ｲｴﾛｰｻﾌﾞﾏﾘﾝ柏": "003163",
         "ﾂﾀﾔ そよら成田ﾆｭｰﾀｳﾝ": "003694",
@@ -246,7 +245,6 @@
         "すばる書店鎌ヶ谷": "004266",
         "房総のむら（総屋）": "004823",
         "房総のむら（資料館）": "004823",
-        
         "大慶園": "004846",
         "茨城鑑定団 神栖": "005401",
         "島忠ﾎｰﾑｽﾞ三郷中央": "016317",
@@ -267,6 +265,40 @@
         "WonderGOO 富里": "087081",
         "WonderGOO 日立中央": "087083",
         "WonderGOO 野田桜の里": "087084"
+    };
+
+    // 🌟 登録地ごとの初期チェック項目定義（未指定の店舗は直前を引き継ぐ）
+    const locationDefaultCategories = {
+        "ｲｴﾛｰｻﾌﾞﾏﾘﾝ柏": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "ﾂﾀﾔ そよら成田ﾆｭｰﾀｳﾝ": ["VAGｶﾌﾟｾﾙ500"],
+        "ｵﾓﾁｬﾉﾊｯﾋﾟｰｽﾏｲﾙ八潮": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "ｶﾌﾟｾﾙ600", "ｶﾌﾟｾﾙ800", "ｶﾌﾟｾﾙ1000", "ｶﾌﾟｾﾙ1500"],
+        "成田ｹﾞｰﾄｳｪｲﾎﾃﾙ": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "ｻﾞ･ｴﾃﾞｨｽﾀｰﾎﾃﾙ成田": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "ｱｼﾞｱﾎﾃﾙ成田": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "すばる書店二十世紀が丘": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "すばる書店六高台": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "すばる書店鎌ヶ谷": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "房総のむら（総屋）": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "房総のむら（資料館）": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "大慶園": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "茨城鑑定団 神栖": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "ｶﾌﾟｾﾙ600", "ｶﾌﾟｾﾙ800", "ｶﾌﾟｾﾙ1000", "ｶﾌﾟｾﾙ1500"],
+        "島忠ﾎｰﾑｽﾞ三郷中央": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "ｲｵﾝ 北小金": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "ﾄｲｻﾞﾗｽ 成田": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "VAGｶﾌﾟｾﾙ500"],
+        "ﾄｲｻﾞﾗｽ 龍ヶ崎": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "VAGｶﾌﾟｾﾙ500"],
+        "ｲｵﾝ ノア": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "ﾋﾞｯｸｶﾒﾗ 柏": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "ひみつのアイプリ", "アイプリバース", "フレンダピック"],
+        "ﾋﾞｯｸｶﾒﾗ 水戸駅": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "ひみつのアイプリ", "アイプリバース", "フレンダピック"],
+        "WonderGOO 石岡": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "ｶﾌﾟｾﾙ600", "ｶﾌﾟｾﾙ800", "ｶﾌﾟｾﾙ1000", "ｶﾌﾟｾﾙ1500", "ｶﾌﾟｾﾙ2000", "ひみつのアイプリ", "フレンダピック"],
+        "WonderGOO ひたち野うしく": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "ｶﾌﾟｾﾙ600", "ｶﾌﾟｾﾙ800", "ｶﾌﾟｾﾙ1000", "ｶﾌﾟｾﾙ1500", "ｶﾌﾟｾﾙ2000", "フレンダピック"],
+        "WonderGOO 鹿島": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "アイプリバース", "フレンダピック"],
+        "WonderGOO鎌ヶ谷": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "WonderGOO ひたちなか": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "ｶﾌﾟｾﾙ600", "ｶﾌﾟｾﾙ800", "ｶﾌﾟｾﾙ1000", "ｶﾌﾟｾﾙ1500", "ｶﾌﾟｾﾙ2000", "ひみつのアイプリ", "フレンダピック"],
+        "WonderGOO つくば": ["ｶｰﾄﾞﾀﾞｽ100", "ｶｰﾄﾞﾀﾞｽ200", "ｶｰﾄﾞﾀﾞｽ300", "Jカード100", "Jカード200", "Jカード300", "ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "フレンダピック"],
+        "WonderGOO 守谷": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500", "ひみつのアイプリ", "アイプリバース", "フレンダピック"],
+        "WonderGOO 富里": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "WonderGOO 日立中央": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"],
+        "WonderGOO 野田桜の里": ["ｶﾌﾟｾﾙ100", "ｶﾌﾟｾﾙ200", "ｶﾌﾟｾﾙ300", "ｶﾌﾟｾﾙ400", "ｶﾌﾟｾﾙ500"]
     };
 
     const categoryMaster = [
@@ -330,10 +362,12 @@
         if (savedAllData) allLocationsData = JSON.parse(savedAllData);
         if (savedLocation && locationMaster[savedLocation]) document.getElementById('inputLocation').value = savedLocation;
         if (savedDate) document.getElementById('inputDate').value = savedDate;
+
         if (savedFilter) {
             visibleCategories = JSON.parse(savedFilter);
         } else {
-            categoryMaster.forEach(c => { visibleCategories[c.id] = true; });
+            // 初回読み込み時に現在の店舗の初期フィルターを適用
+            applyLocationDefaultFilter(document.getElementById('inputLocation').value);
         }
 
         renderCategoryButtons();
@@ -343,6 +377,23 @@
         renderCompletedLocations();
         updateDisplay();
     });
+
+    // 🌟 登録地に応じたフィルター自動切り替えロジック
+    function applyLocationDefaultFilter(locName) {
+        const defaults = locationDefaultCategories[locName];
+        if (defaults && defaults.length > 0) {
+            // 一旦すべて非表示にする
+            categoryMaster.forEach(c => { visibleCategories[c.id] = false; });
+            // 定義にあるものだけ表示にする
+            categoryMaster.forEach(c => {
+                if (defaults.includes(c.name)) {
+                    visibleCategories[c.id] = true;
+                }
+            });
+            localStorage.setItem('hojuu_visible_categories_tanaka', JSON.stringify(visibleCategories));
+        }
+        // リストに存在しない、または指定がない（空）の店舗は何もせず「直前のチェックを引き継ぐ」
+    }
 
     function renderCategoryButtons() {
         const groups = { carddas: "grid-carddas", capsule: "grid-capsule", vag: "grid-vag", cardgame: "grid-cardgame" };
@@ -431,8 +482,16 @@
         });
     }
 
+    // 🌟 登録地変更時
     function onChangeLocation() {
-        localStorage.setItem('hojuu_hand_location_tanaka', document.getElementById('inputLocation').value);
+        const loc = document.getElementById('inputLocation').value;
+        localStorage.setItem('hojuu_hand_location_tanaka', loc);
+        
+        // 登録地に応じたフィルター変更を適用
+        applyLocationDefaultFilter(loc);
+        renderCategoryButtons();
+        renderFilterOptions();
+        checkGroupVisibility();
     }
 
     function saveToStorage(isManual = false) {
@@ -500,6 +559,12 @@
         dataList = [...allLocationsData[loc]];
         
         delete allLocationsData[loc];
+        
+        // 復元した店舗のデフォルトフィルターに合わせる
+        applyLocationDefaultFilter(loc);
+        renderCategoryButtons();
+        renderFilterOptions();
+        checkGroupVisibility();
         
         renderTable();
         renderCompletedLocations();
@@ -699,7 +764,6 @@
 
     csvBtn.addEventListener('click', () => {
         const finalExportData = {};
-        
         Object.keys(allLocationsData).forEach(loc => {
             finalExportData[loc] = [...allLocationsData[loc]];
         });
