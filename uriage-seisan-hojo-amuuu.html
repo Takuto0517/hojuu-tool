@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <!-- 初期状態はスマホ向け最適化 -->
     <meta id="viewport-meta" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ミュー専用売上報告書計算ツール</title>
     <style>
@@ -153,14 +152,14 @@
             color: #fff;
         }
 
-        /* 入力フォーム設定 */
+        /* ①追加修正：内訳・枚数入力欄のスマートフォン最適化 */
         select {
             width: 100%;
-            height: 44px;
+            height: 48px; /* 44pxからタップしやすく拡大 */
             border: 2px solid var(--ss-blue);
             border-radius: 8px;
-            padding: 0 10px;
-            font-size: 15px;
+            padding: 0 12px;
+            font-size: 16px; /* スマホの自動ズーム防止しつつ見やすく */
             font-weight: 700;
             outline: none;
             background: #fff;
@@ -171,8 +170,8 @@
         }
         
         input[type="number"] {
-            width: 85px;
-            height: 38px;
+            width: 95px; /* 85pxから少しゆったりに */
+            height: 42px; /* 38pxから拡大し入力しやすく */
             border: 1px solid #94a3b8;
             border-radius: 6px;
             font-size: 16px;
@@ -196,8 +195,8 @@
         /* 入力明細行レイアウト */
         .item-row {
             border-bottom: 2px dashed #cbd5e1;
-            padding-bottom: 14px;
-            margin-bottom: 14px;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
         }
         .item-row:last-child {
             border-bottom: none;
@@ -216,13 +215,13 @@
         .denoms-container {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px; /* 間隔を広げて誤操作防止 */
             margin-top: 8px;
             background: #f8fafc;
-            padding: 8px;
+            padding: 10px;
             border-radius: 8px;
             border: 1px solid #e2e8f0;
-            max-width: 240px;
+            max-width: 260px;
         }
         
         .denom-field {
@@ -232,12 +231,12 @@
             width: 100%;
         }
         .denom-field span {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 800;
             color: #475569;
         }
         .row-total-lbl {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 800;
             color: var(--ss-blue);
         }
@@ -247,7 +246,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 44px;
+            height: 46px;
             border-radius: 8px;
             font-size: 15px;
             font-weight: 700;
@@ -257,7 +256,7 @@
         }
         .btn:active { opacity: 0.8; }
         .btn-secondary { background-color: #f1f5f9; color: #334155; border: 2px solid #cbd5e1; margin-top: 6px; }
-        .btn-danger { background-color: #ef4444; color: #fff; height: 38px; width: auto; padding: 0 14px; font-size: 14px; border-radius: 6px; display: inline-flex; }
+        .btn-danger { background-color: #ef4444; color: #fff; height: 42px; width: auto; padding: 0 16px; font-size: 14px; border-radius: 6px; display: inline-flex; }
         .btn-success { background-color: #10b981; color: #fff; font-size: 16px; height: 50px; margin-top: 24px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
         
         /* 全体プレビューを表示ボタン */
@@ -370,7 +369,7 @@
             border-right: none;
         }
 
-        /* 通常画面（下部ブロック） */
+        /* 通常画面の下部ブロック */
         .preview-bottom-layout {
             display: block;
             margin-top: 10px;
@@ -398,7 +397,9 @@
             width: 100%;
         }
 
-        /* 全体プレビュー（モーダル全画面用） */
+        /* ====================================================
+           ★全体プレビュー（モーダル）完全横長・PDF仕様スタイル
+        ==================================================== */
         .fullscreen-overlay {
             display: none;
             position: fixed;
@@ -406,14 +407,15 @@
             background: rgba(15, 23, 42, 0.95);
             z-index: 9999;
             flex-direction: column;
-            padding: 12px;
+            padding: 0;
         }
         .fullscreen-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            padding: 12px 16px;
             width: 100%;
+            background: #1e293b;
         }
         .fullscreen-mode-title {
             color: #fff;
@@ -429,7 +431,6 @@
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         
         .modal-scroll-area {
@@ -437,19 +438,37 @@
             width: 100%;
             overflow: auto; 
             -webkit-overflow-scrolling: touch;
-            background: #fff; /* 背景色を白に戻しました */
-            border-radius: 8px;
-            padding: 12px;
+            background: #0f172a;
+            position: relative;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
         }
 
-        /* ★モーダル表示時はPDFと同じく「絶対幅750px」として配置（自動フィッティング無効化とセットで崩れを完全防御） */
+        /* 用紙そのものを反時計回り、または時計回りに回転して「完全に横向き」に固定 */
         .modal-scroll-area #print-preview {
             border: none !important;
-            margin: 0 auto !important;
-            padding: 0 !important;
+            padding: 24px !important;
             width: 750px !important;
             min-width: 750px !important;
+            transform: rotate(90deg) translate(0px, 0px); /* ★縦画面時に用紙を90度回転して横長にする */
+            transform-origin: top center;
+            margin-top: 40px !important; /* 回転時の位置調整マージン */
+            margin-bottom: 400px !important; /* スクロール領域を確保 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: #fff !important;
         }
+
+        /* 画面が最初から横向き(Landscape)の場合は回転を解除するスマート対応 */
+        @media screen and (orientation: landscape) {
+            .modal-scroll-area #print-preview {
+                transform: none !important;
+                margin-top: 0 !important;
+                margin-bottom: 0 !important;
+            }
+        }
+
         .modal-scroll-area .btn-preview-mode {
             display: none !important;
         }
@@ -463,7 +482,7 @@
             table-layout: fixed !important;
         }
         
-        /* 浮動配置（float）で3:7の横並びを絶対維持 */
+        /* 浮動配置（float）で金種3:備考7の横並びをキープ */
         .modal-scroll-area .preview-bottom-layout {
             display: block !important;
             width: 100% !important;
@@ -493,11 +512,11 @@
             min-height: 148px;
         }
 
-        /* 印刷時の用紙レイアウト設定 */
+        /* 印刷設定 */
         @media print {
             body * { display: none; }
             #print-preview, #print-preview * { display: block; }
-            #print-preview { display: block !important; border: none; padding: 0; margin: 0; width: 100% !important; }
+            #print-preview { display: block !important; border: none; padding: 0; margin: 0; width: 100% !important; transform: none !important; }
             .btn-preview-mode { display: none !important; }
             .table-scroll-container { border: none; overflow-x: visible; }
             .report-table { width: 100% !important; table-layout: fixed !important; }
@@ -652,7 +671,7 @@
 
 <div id="fullscreenModal" class="fullscreen-overlay">
     <div class="fullscreen-header">
-        <span class="fullscreen-mode-title">📄 全体プレビュー（実際の印刷レイアウト）</span>
+        <span class="fullscreen-mode-title">📄 全体プレビュー（横長・実際の印刷レイアウト）</span>
         <button class="fullscreen-close-btn" onclick="closeFullscreenPreview()">✕ 閉じる</button>
     </div>
     <div class="modal-scroll-area" id="modal-content-area">
@@ -934,8 +953,7 @@
         targetArea.innerHTML = '';
         targetArea.appendChild(previewClone);
         
-        // ★【大手術】モーダルを開く瞬間だけ、iPhoneの「画面幅に合わせる」自動縮小機能を完全OFFにする
-        // これにより本物のPDFや写真を開いたときと全く同じ動作になり、絶対に縮まなくなります。自由なズームも可能です。
+        // モーダルを開く瞬間、自動縮小機能を一時的にOFFにして自由な拡大縮小を許可する
         const meta = document.getElementById('viewport-meta');
         meta.setAttribute('content', 'width=750, initial-scale=0.5, minimum-scale=0.1, maximum-scale=3.0, user-scalable=yes');
 
@@ -944,7 +962,6 @@
     }
 
     function closeFullscreenPreview() {
-        // ★閉じる時は、元のスマホ用viewport（自動縮小あり）に戻す
         const meta = document.getElementById('viewport-meta');
         meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
 
