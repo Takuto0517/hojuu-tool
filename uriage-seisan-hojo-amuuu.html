@@ -2,7 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 初期状態はスマホ向け最適化 -->
+    <meta id="viewport-meta" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ミュー専用売上報告書計算ツール</title>
     <style>
         *, *::before, *::after {
@@ -369,7 +370,7 @@
             border-right: none;
         }
 
-        /* 通常画面（スマホ縦画面用）：通常は縦積み */
+        /* 通常画面（下部ブロック） */
         .preview-bottom-layout {
             display: block;
             margin-top: 10px;
@@ -431,25 +432,23 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         
-        /* ★重要：はみ出たプレビュー用紙（750px）をスクロールさせるコンテナ */
         .modal-scroll-area {
             flex: 1;
             width: 100%;
             overflow: auto; 
             -webkit-overflow-scrolling: touch;
-            background: #ccc; /* プレビュー用紙が分かりやすいように背景をグレーに */
+            background: #fff; /* 背景色を白に戻しました */
             border-radius: 8px;
             padding: 12px;
         }
 
-        /* ★超重要：モーダル表示時はFlexを完全に解除し、A4横幅（750px）を絶対に潰さない枠組みにする */
+        /* ★モーダル表示時はPDFと同じく「絶対幅750px」として配置（自動フィッティング無効化とセットで崩れを完全防御） */
         .modal-scroll-area #print-preview {
             border: none !important;
             margin: 0 auto !important;
-            padding: 20px !important;
-            width: 750px !important; /* 絶対固定（iPhoneの圧縮を無効化） */
+            padding: 0 !important;
+            width: 750px !important;
             min-width: 750px !important;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
         .modal-scroll-area .btn-preview-mode {
             display: none !important;
@@ -461,14 +460,14 @@
         .modal-scroll-area .report-table {
             width: 100% !important;
             min-width: 100% !important;
+            table-layout: fixed !important;
         }
         
-        /* ★モーダル内限定：Flexを使わず、浮動配置（float）で3:7の横並びを絶対維持 */
+        /* 浮動配置（float）で3:7の横並びを絶対維持 */
         .modal-scroll-area .preview-bottom-layout {
             display: block !important;
             width: 100% !important;
             clear: both !important;
-            content: "" !important;
         }
         .modal-scroll-area .preview-bottom-layout::after {
             content: "";
@@ -478,7 +477,7 @@
         .modal-scroll-area .bottom-left-block {
             display: block !important;
             float: left !important;
-            width: 30% !important;  /* 確実に3割をキープ */
+            width: 30% !important;
             margin-bottom: 0 !important;
         }
         .modal-scroll-area .denom-vertical-table {
@@ -488,7 +487,7 @@
         .modal-scroll-area .bottom-right-block {
             display: block !important;
             float: right !important;
-            width: 67% !important; /* 確実に約7割をキープ */
+            width: 67% !important;
         }
         .modal-scroll-area .remarks-box {
             min-height: 148px;
@@ -503,7 +502,6 @@
             .table-scroll-container { border: none; overflow-x: visible; }
             .report-table { width: 100% !important; table-layout: fixed !important; }
             
-            /* 印刷時も3:7の横並びを維持 */
             .preview-bottom-layout { display: block !important; width: 100% !important; }
             .preview-bottom-layout::after { content: ""; display: block; clear: both; }
             .bottom-left-block { display: block !important; float: left !important; width: 30% !important; margin-bottom: 0 !important; }
@@ -802,7 +800,7 @@
     function calculateRowAmt(el) {
         const row = el.closest('.item-row');
         const v10000 = (parseInt(row.querySelector('.input-d10000').value) || 0) * 10000;
-        const v1000 = (parseInt(row.querySelector('.input-d1000').value) || 0) * 100;
+        const v1000 = (parseInt(row.querySelector('.input-d1000').value) || 0) * 1000;
         const v500 = (parseInt(row.querySelector('.input-d500').value) || 0) * 500;
         const v100 = (parseInt(row.querySelector('.input-d100').value) || 0) * 100;
         const total = v10000 + v1000 + v500 + v100;
@@ -936,12 +934,20 @@
         targetArea.innerHTML = '';
         targetArea.appendChild(previewClone);
         
+        // ★【大手術】モーダルを開く瞬間だけ、iPhoneの「画面幅に合わせる」自動縮小機能を完全OFFにする
+        // これにより本物のPDFや写真を開いたときと全く同じ動作になり、絶対に縮まなくなります。自由なズームも可能です。
+        const meta = document.getElementById('viewport-meta');
+        meta.setAttribute('content', 'width=750, initial-scale=0.5, minimum-scale=0.1, maximum-scale=3.0, user-scalable=yes');
+
         document.getElementById('fullscreenModal').style.display = 'flex';
-        // モーダル表示中、ツール背後の本体画面スクロールを抑止
         document.body.style.overflow = 'hidden'; 
     }
 
     function closeFullscreenPreview() {
+        // ★閉じる時は、元のスマホ用viewport（自動縮小あり）に戻す
+        const meta = document.getElementById('viewport-meta');
+        meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+
         document.getElementById('fullscreenModal').style.display = 'none';
         document.body.style.overflow = '';
     }
