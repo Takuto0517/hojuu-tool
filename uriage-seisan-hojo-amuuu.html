@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ミュー専用売上報告書計算ツール</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        :root {
+            --ss-blue: #0052cc;
+            --ss-blue-light: #f0f5ff;
+            --ss-border: #b3d1ff;
+            --cainz-green: #008542;
+            --beisia-red: #e60012;
+            --bg-gray: #f1f5f9;
+            --text-main: #1e293b;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-gray);
+            color: var(--text-main);
+            margin: 0;
+            padding: 16px 12px;
+            -webkit-text-size-adjust: 100%;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+        h1 {
+            font-size: 20px;
+            text-align: center;
+            margin: 10px 0 24px 0;
+            color: #0f172a;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(15,23,42,0.04);
+            border: 1px solid #e2e8f0;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #334155;
+            margin: 24px 0 10px 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* アコーディオン設定 */
+        .ss-accordion {
+            background: #fff;
+            border: 1px solid var(--ss-border);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 10px rgba(0,82,204,0.04);
+            overflow: hidden;
+        }
+        .ss-accordion-header {
+            padding: 16px;
+            font-weight: bold;
+            font-size: 15px;
+            color: var(--ss-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            background: var(--ss-blue-light);
+        }
+        .ss-accordion-content {
+            padding: 4px 16px 16px 16px;
+            background: #fff;
+        }
+        
+        .ss-group-box {
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 14px;
+            background: #fff;
+        }
+        .ss-group-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #475569;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 6px;
+        }
+        
+        .ss-checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+        .ss-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+            padding: 4px 0;
+        }
+        .ss-checkbox-label input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--ss-blue);
+            cursor: pointer;
+        }
+        
+        /* 店舗切り替えトグル */
+        .group-toggle-container {
+            display: flex;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+            margin-bottom: 18px;
+            height: 56px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+        .group-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            background: #fff;
+            color: #64748b;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .group-btn[data-group="cainz"].active {
+            background-color: var(--cainz-green);
+            color: #fff;
+        }
+        .group-btn[data-group="beisia"].active {
+            background-color: var(--beisia-red);
+            color: #fff;
+        }
+
+        /* 入力フォーム共通 */
+        select {
+            width: 100%; height: 46px; border: 2px solid #cbd5e1; border-radius: 8px;
+            padding: 0 12px; font-size: 16px; font-weight: 600; outline: none; background: #fff;
+        }
+        select:focus { border-color: var(--ss-blue); background-color: var(--ss-blue-light); }
+        input[type="number"] {
+            width: 100%; height: 46px; border: 2px solid #cbd5e1; border-radius: 8px;
+            font-size: 17px; font-weight: 700; text-align: right; padding: 0 10px; outline: none; -moz-appearance: textfield;
+        }
+        input[type="number"]:focus { border-color: var(--ss-blue); background-color: var(--ss-blue-light); }
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        /* 入力明細行 */
+        .item-row { border-bottom: 2px dashed #cbd5e1; padding-bottom: 16px; margin-bottom: 16px; }
+        .item-row:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+        .denoms-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+        .denom-field { flex: 1; min-width: 85px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; text-align: center; }
+        .denom-field span { font-size: 12px; font-weight: 800; color: #475569; display: block; margin-bottom: 6px; }
+        .row-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .row-total-lbl { font-size: 15px; font-weight: 800; color: var(--ss-blue); }
+
+        /* ボタン */
+        .btn { display: flex; align-items: center; justify-content: center; height: 48px; border-radius: 8px; font-size: 16px; font-weight: 700; border: none; cursor: pointer; width: 100%; }
+        .btn:active { opacity: 0.8; }
+        .btn-primary { background-color: var(--ss-blue); color: #fff; }
+        .btn-secondary { background-color: #f1f5f9; color: #334155; border: 2px solid #cbd5e1; margin-top: 8px; }
+        .btn-danger { background-color: #ef4444; color: #fff; height: 38px; width: auto; padding: 0 14px; font-size: 14px; border-radius: 6px; }
+        .btn-success { background-color: #10b981; color: #fff; font-size: 18px; height: 56px; margin-top: 28px; box-shadow: 0 4px 14px rgba(16,185,129,0.3); }
+
+        .landscape-alert { background: #fef08a; color: #854d0e; text-align: center; padding: 12px; font-size: 13px; font-weight: bold; border-radius: 8px; margin-bottom: 16px; border: 1px solid #fde047; }
+        @media screen and (min-width: 768px) { .landscape-alert { display: none; } }
+
+        /* ----------------------------------------------------
+           プレビュー画面のレイアウト
+        ---------------------------------------------------- */
+        #print-preview {
+            background: #fff;
+            color: #000;
+            padding: 26px;
+            margin-top: 20px;
+            border: 3px solid #000;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .report-header-layout {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .store-badge-preview {
+            display: inline-block;
+            padding: 5px 16px;
+            font-size: 15px;
+            font-weight: 900;
+            color: #fff;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+        .store-badge-preview.cainz { background-color: var(--cainz-green); }
+        .store-badge-preview.beisia { background-color: var(--beisia-red); }
+
+        .preview-title {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 4px;
+            border-bottom: 3px double #000;
+            padding-bottom: 6px;
+            margin-bottom: 24px;
+        }
+        
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-bottom: 24px;
+            table-layout: fixed;
+        }
+        .report-table th, .report-table td {
+            border: 1px solid #000;
+            padding: 10px 4px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .report-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .text-left { text-align: left !important; padding-left: 8px !important; }
+        .text-right { text-align: right !important; padding-right: 8px !important; }
+
+        .td-code-grid {
+            padding: 0 !important;
+            vertical-align: middle;
+        }
+        .code-grid-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            min-height: 36px;
+            align-items: center;
+        }
+        .code-grid-char {
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+            font-size: 15px;
+            font-family: monospace;
+            border-right: 1px solid #000;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .code-grid-char:last-child {
+            border-right: none;
+        }
+
+        .denom-vertical-table {
+            max-width: 400px;
+            margin-bottom: 24px;
+        }
+        
+        .remarks-wrapper {
+            margin-top: 16px;
+        }
+        .remarks-box {
+            border: 1px solid #000;
+            padding: 12px;
+            min-height: 90px;
+            font-size: 13px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        @media print {
+            body * { display: none; }
+            #print-preview, #print-preview * { display: block; }
+            #print-preview { display: block !important; border: none; padding: 0; margin: 0; }
+            .report-header-layout { display: flex !important; }
+            .report-table { display: table !important; width: 100% !important; }
+            .report-table th, .report-table td { display: table-cell !important; }
+            .td-code-grid { display: table-cell !important; padding: 0 !important; }
+            .code-grid-container { display: flex !important; }
+            .code-grid-char { display: flex !important; }
+            .denom-vertical-table { max-width: 100% !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ミュー専用売上報告書計算ツール</h1>
+
+    <div class="landscape-alert">
+        💡 iPhoneを横向きに回転させると、プレビューが出力用紙幅でさらに見やすくなります。
+    </div>
+
+    <!-- 店舗切り替え -->
+    <div class="group-toggle-container">
+        <button type="button" class="group-btn active" data-group="cainz" onclick="setStoreGroup('cainz')">カインズ</button>
+        <button type="button" class="group-btn" data-group="beisia" onclick="setStoreGroup('beisia')">ベイシア</button>
+    </div>
+    <input type="hidden" id="meta-store-group" value="cainz">
+
+    <!-- 金種表示設定 -->
+    <div class="ss-accordion">
+        <div class="ss-accordion-header" onclick="toggleSSAccordion('acc-denom', 'arrow-denom')">
+            <span>🔍 表示する金種を選択（クリックで展開/格納）</span>
+            <span id="arrow-denom">▲</span>
+        </div>
+        <div class="ss-accordion-content" id="acc-denom">
+            <div class="ss-checkbox-grid" style="margin-top: 12px;">
+                <label class="ss-checkbox-label"><input type="checkbox" id="chk-v10000" checked onchange="toggleDenomVisibility()"> 10,000円</label>
+                <label class="ss-checkbox-label"><input type="checkbox" id="chk-v1000" checked onchange="toggleDenomVisibility()"> 1,000円</label>
+                <label class="ss-checkbox-label"><input type="checkbox" id="chk-v500" checked onchange="toggleDenomVisibility()"> 500円</label>
+                <label class="ss-checkbox-label"><input type="checkbox" id="chk-v100" checked onchange="toggleDenomVisibility()"> 100円</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- ジャンル別アイテムフィルター設定 -->
+    <div class="ss-accordion">
+        <div class="ss-accordion-header" onclick="toggleSSAccordion('acc-genre', 'arrow-genre')">
+            <span>🔍 表示するカテゴリーを選択（クリックで展開/格納）</span>
+            <span id="arrow-genre">▲</span>
+        </div>
+        <div class="ss-accordion-content" id="acc-genre">
+            <div id="config-items-wrapper"></div>
+        </div>
+    </div>
+
+    <!-- 内訳・枚数入力 -->
+    <div class="section-title">内訳・枚数入力</div>
+    <div class="card" id="input-rows-container"></div>
+    <button class="btn btn-secondary" onclick="addInputRow()">+ 新しい内訳入力行を追加</button>
+
+    <button class="btn btn-success" onclick="processCalculations(true)">最終確定してプレビューへスクロール</button>
+
+    <!-- ----------------------------------------------------
+       報告書プレビュー表示エリア
+    ---------------------------------------------------- -->
+    <div class="section-title" id="preview-section-title">📊 報告書プレビュー (リアルタイム連動中)</div>
+    
+    <!-- プレビュー枠（印刷対象） -->
+    <div id="print-preview">
+        <!-- 上部ヘッダー（バッジのみ表示） -->
+        <div class="report-header-layout">
+            <div>
+                <span id="p-active-store-badge" class="store-badge-preview cainz">カインズ</span>
+            </div>
+        </div>
+        
+        <div class="preview-title">ミュー専用売上金報告書</div>
+
+        <!-- 【上部】売上明細テーブル -->
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">【売上明細内訳】</div>
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th style="width: 6%;">No</th>
+                    <th style="width: 35%;">ジャンル名</th>
+                    <th style="width: 17%;">売上送信コード</th>
+                    <th style="width: 14%;">集金額(税込)</th>
+                    <th style="width: 14%;">売上金(税抜)</th>
+                    <th style="width: 14%;">消費税</th>
+                </tr>
+            </thead>
+            <tbody id="p-main-tbody">
+                <!-- JavaScriptにより生成 -->
+            </tbody>
+        </table>
+
+        <!-- 【下部】金種別現金残高テーブル -->
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 6px;">【金種別現金残高】</div>
+        <table class="report-table denom-vertical-table">
+            <thead>
+                <tr>
+                    <th style="width: 35%;">金種</th>
+                    <th style="width: 25%;">枚数</th>
+                    <th style="width: 40%;">金額</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>10,000円</td>
+                    <td id="p-count-10000" class="text-right">-</td>
+                    <td id="p-amt-10000" class="text-right">-</td>
+                </tr>
+                <tr>
+                    <td>1,000円</td>
+                    <td id="p-count-1000" class="text-right">-</td>
+                    <td id="p-amt-1000" class="text-right">-</td>
+                </tr>
+                <tr>
+                    <td>500円</td>
+                    <td id="p-count-500" class="text-right">-</td>
+                    <td id="p-amt-500" class="text-right">-</td>
+                </tr>
+                <tr>
+                    <td>100円</td>
+                    <td id="p-count-100" class="text-right">-</td>
+                    <td id="p-amt-100" class="text-right">-</td>
+                </tr>
+                <tr style="font-weight: bold; background-color: #f2f2f2;">
+                    <td>合計</td>
+                    <td id="p-count-total" class="text-right">0</td>
+                    <td id="p-amt-total" class="text-right">¥0</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 最下部：備考欄 -->
+        <div class="remarks-wrapper">
+            <div style="font-size:12px; font-weight:bold; margin-bottom:6px;">（備考欄）内訳別アイテム詳細:</div>
+            <div class="remarks-box" id="p-remarks"></div>
+        </div>
+    </div>
+
+    <!-- リセットボタンをプレビューの枠の外側（直下）に配置 -->
+    <div style="margin-top: 20px; text-align: center;">
+        <button class="btn btn-danger" style="width:auto; display:inline-flex; padding:0 36px; height:50px; font-size:16px;" onclick="resetInputFields()">🔄 入力内容をすべてリセット</button>
+    </div>
+</div>
+
+<script>
+    // マスタ情報
+    const genreMaster = [
+        { id: 0, name: "ミューオリジナル①", cainz: "10154", beisia: "05983", items: ["ゆるキャン"] },
+        { id: 1, name: "他社カプセル", cainz: "09407", beisia: "07196", items: ["カプセル"] },
+        { id: 2, name: "掛高①", cainz: "09660", beisia: "07471", items: ["ちいかわ", "仮面ライダー連動", "ケンアンパンマン"] },
+        { id: 3, name: "バンダイカプセル", cainz: "09733", beisia: "07625", items: ["カードダス", "Jカードダス", "バンダイカプセル"] },
+        { id: 4, name: "ゲーム", cainz: "09792", beisia: "07749", items: ["ぴよりーな", "ぴよりーな（すみっコぐらし）", "ぴよりーな（カービィ）", "ぴよりーな（レア）", "ぴよりーな（ハーフ）プチプリムルミエール", "トリプルミニクレーンクリスタル", "Gキャッチャーライトミニ", "ME‐01"] },
+        { id: 5, name: "ミューオリジナル掛高②", cainz: "52787", beisia: "50032", items: ["東武プラレール"] },
+        { id: 6, name: "ミューオリジナル掛高③", cainz: "52795", beisia: "50040", items: ["高崎だるま"] }
+    ];
+
+    window.onload = function() {
+        renderConfigSettings();
+        initDefaultRows();
+    };
+
+    function initDefaultRows() {
+        const container = document.getElementById('input-rows-container');
+        container.innerHTML = '';
+        for (let i = 0; i < 3; i++) {
+            addInputRow();
+        }
+        processCalculations();
+    }
+
+    // カテゴリー・金種設定を引き継ぐリセット処理
+    function resetInputFields() {
+        if(!confirm("内訳と枚数入力をすべてクリアします。よろしいですか？\n(※カテゴリーや金種の表示設定は維持されます)")) return;
+        initDefaultRows();
+        // 画面最上部へスムーズにスクロール
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setStoreGroup(group) {
+        document.querySelectorAll('.group-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.group-btn[data-group="${group}"]`).classList.add('active');
+        document.getElementById('meta-store-group').value = group;
+        processCalculations();
+    }
+
+    function toggleSSAccordion(contentId, arrowId) {
+        const content = document.getElementById(contentId);
+        const arrow = document.getElementById(arrowId);
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            arrow.innerText = '▲';
+        } else {
+            content.style.display = 'none';
+            arrow.innerText = '▼';
+        }
+    }
+
+    function renderConfigSettings() {
+        const wrapper = document.getElementById('config-items-wrapper');
+        wrapper.innerHTML = '';
+        genreMaster.forEach(g => {
+            const box = document.createElement('div');
+            box.className = 'ss-group-box';
+            box.innerHTML = `<div class="ss-group-title">■ ${g.name}</div>`;
+            const grid = document.createElement('div');
+            grid.className = 'ss-checkbox-grid';
+            g.items.forEach(item => {
+                const lbl = document.createElement('label');
+                lbl.className = 'ss-checkbox-label';
+                lbl.innerHTML = `<input type="checkbox" class="item-toggle-chk" data-genre-id="${g.id}" data-item-name="${item}" checked onchange="updateAllSelectDropdowns()"> ${item}`;
+                grid.appendChild(lbl);
+            });
+            box.appendChild(grid);
+            wrapper.appendChild(box);
+        });
+    }
+
+    function updateAllSelectDropdowns() {
+        const activeItems = [];
+        document.querySelectorAll('.item-toggle-chk').forEach(chk => {
+            if (chk.checked) {
+                activeItems.push({ genreId: chk.getAttribute('data-genre-id'), name: chk.getAttribute('data-item-name') });
+            }
+        });
+        document.querySelectorAll('.row-item-select').forEach(select => {
+            const currentVal = select.value;
+            let html = `<option value="">-- 内訳項目を選択 --</option>`;
+            genreMaster.forEach(g => {
+                const subItems = activeItems.filter(ai => ai.genreId == g.id);
+                if (subItems.length > 0) {
+                    html += `<optgroup label="■ ${g.name}">`;
+                    subItems.forEach(si => {
+                        html += `<option value="${g.id}|${si.name}">${si.name}</option>`;
+                    });
+                    html += `</optgroup>`;
+                }
+            });
+            select.innerHTML = html;
+            select.value = currentVal;
+        });
+        processCalculations();
+    }
+
+    function toggleDenomVisibility() {
+        const denoms = ['10000', '1000', '500', '100'];
+        denoms.forEach(d => {
+            const isChecked = document.getElementById(`chk-v${d}`).checked;
+            document.querySelectorAll(`.df-${d}`).forEach(el => el.style.display = isChecked ? 'block' : 'none');
+        });
+        processCalculations();
+    }
+
+    function addInputRow() {
+        const container = document.getElementById('input-rows-container');
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'item-row';
+        rowDiv.innerHTML = `
+            <div class="row-header">
+                <div style="flex:1;">
+                    <select class="row-item-select" onchange="calculateRowAmt(this)"></select>
+                </div>
+                <button class="btn btn-danger" onclick="removeRow(this)">削除</button>
+            </div>
+            <div class="denoms-container">
+                <div class="denom-field df-10000"><span>10,000円</span><input type="number" class="input-d10000" placeholder="0" oninput="calculateRowAmt(this)"></div>
+                <div class="denom-field df-1000"><span>1,000円</span><input type="number" class="input-d1000" placeholder="0" oninput="calculateRowAmt(this)"></div>
+                <div class="denom-field df-500"><span>500円</span><input type="number" class="input-d500" placeholder="0" oninput="calculateRowAmt(this)"></div>
+                <div class="denom-field df-100"><span>100円</span><input type="number" class="input-d100" placeholder="0" oninput="calculateRowAmt(this)"></div>
+            </div>
+            <div style="text-align:right; margin-top:6px;">
+                <span class="row-total-lbl">小計: ¥<span class="row-total-val">0</span></span>
+            </div>
+        `;
+        container.appendChild(rowDiv);
+        updateAllSelectDropdowns();
+        toggleDenomVisibility();
+    }
+
+    function removeRow(btn) {
+        btn.closest('.item-row').remove();
+        processCalculations();
+    }
+
+    function calculateRowAmt(el) {
+        const row = el.closest('.item-row');
+        const v10000 = (parseInt(row.querySelector('.input-d10000').value) || 0) * 10000;
+        const v1000 = (parseInt(row.querySelector('.input-d1000').value) || 0) * 1000;
+        const v500 = (parseInt(row.querySelector('.input-d500').value) || 0) * 500;
+        const v100 = (parseInt(row.querySelector('.input-d100').value) || 0) * 100;
+        const total = v10000 + v1000 + v500 + v100;
+        row.querySelector('.row-total-val').innerText = total.toLocaleString();
+        processCalculations();
+    }
+
+    function generateCodeGridHTML(codeStr) {
+        const code = codeStr || "     ";
+        let html = '<div class="code-grid-container">';
+        for (let i = 0; i < 5; i++) {
+            const char = code[i] || '';
+            html += `<span class="code-grid-char">${char}</span>`;
+        }
+        html += '</div>';
+        return html;
+    }
+
+    function processCalculations(isExplicitLock = false) {
+        const storeGroup = document.getElementById('meta-store-group').value;
+        const storeBadge = document.getElementById('p-active-store-badge');
+        if (storeGroup === 'cainz') {
+            storeBadge.innerText = 'カインズ';
+            storeBadge.className = 'store-badge-preview cainz';
+        } else {
+            storeBadge.innerText = 'ベイシア';
+            storeBadge.className = 'store-badge-preview beisia';
+        }
+
+        let c = { 10000:0, 1000:0, 500:0, 100:0 };
+        let genreSummary = {};
+        
+        genreMaster.forEach(g => { 
+            genreSummary[g.id] = { hasSelected: false, inclusive: 0, subItems: [] }; 
+        });
+
+        document.querySelectorAll('.item-row').forEach(row => {
+            const selectVal = row.querySelector('.row-item-select').value;
+            if(!selectVal) return;
+
+            const [genreId, itemName] = selectVal.split('|');
+            genreSummary[genreId].hasSelected = true;
+
+            const n10000 = parseInt(row.querySelector('.input-d10000').value) || 0;
+            const n1000 = parseInt(row.querySelector('.input-d1000').value) || 0;
+            const n500 = parseInt(row.querySelector('.input-d500').value) || 0;
+            const n100 = parseInt(row.querySelector('.input-d100').value) || 0;
+
+            c[10000] += n10000; c[1000] += n1000; c[500] += n500; c[100] += n100;
+
+            const rowSum = (n10000*10000)+(n1000*1000)+(n500*500)+(n100*100);
+            genreSummary[genreId].inclusive += rowSum;
+            genreSummary[genreId].subItems.push(`${itemName}：¥${rowSum.toLocaleString()}`);
+        });
+
+        const keys = ['10000', '1000', '500', '100'];
+        let totalCount = 0;
+        keys.forEach(k => {
+            const countCell = document.getElementById(`p-count-${k}`);
+            const amtCell = document.getElementById(`p-amt-${k}`);
+            if (c[k] > 0) {
+                countCell.innerText = c[k].toLocaleString();
+                amtCell.innerText = "¥" + (c[k] * parseInt(k)).toLocaleString();
+            } else {
+                countCell.innerText = '-';
+                amtCell.innerText = '-';
+            }
+            totalCount += c[k];
+        });
+        const grandCashTotal = (c[10000]*10000)+(c[1000]*1000)+(c[500]*500)+(c[100]*100);
+        document.getElementById('p-count-total').innerText = totalCount.toLocaleString();
+        document.getElementById('p-amt-total').innerText = "¥" + grandCashTotal.toLocaleString();
+
+        const tbody = document.getElementById('p-main-tbody');
+        tbody.innerHTML = '';
+        let totalTaxInc = 0, totalTaxExc = 0, totalTaxAmt = 0;
+        let remarksArr = [];
+        let printedRowCount = 0;
+
+        genreMaster.forEach(genre => {
+            const data = genreSummary[genre.id];
+            if (!data || !data.hasSelected) return;
+
+            printedRowCount++;
+            const code = storeGroup === 'cainz' ? genre.cainz : genre.beisia;
+            const taxExc = Math.ceil(data.inclusive / 1.1); 
+            const taxAmt = data.inclusive - taxExc;
+
+            totalTaxInc += data.inclusive;
+            totalTaxExc += taxExc;
+            totalTaxAmt += taxAmt;
+
+            if(data.subItems.length > 0) {
+                remarksArr.push(data.subItems.join('\n'));
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${printedRowCount}</td>
+                <td class="text-left" style="font-weight: bold; font-size:13px;">${genre.name}</td>
+                <td class="td-code-grid">${generateCodeGridHTML(code)}</td>
+                <td class="text-right">${data.inclusive > 0 ? data.inclusive.toLocaleString() : '0'}</td>
+                <td class="text-right">${data.inclusive > 0 ? taxExc.toLocaleString() : '0'}</td>
+                <td class="text-right">${data.inclusive > 0 ? taxAmt.toLocaleString() : '0'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        const totalTr = document.createElement('tr');
+        totalTr.style.fontWeight = 'bold';
+        totalTr.style.backgroundColor = '#f2f2f2';
+        totalTr.innerHTML = `
+            <td colspan="3">合 計 金 額</td>
+            <td class="text-right">¥${totalTaxInc.toLocaleString()}</td>
+            <td class="text-right">¥${totalTaxExc.toLocaleString()}</td>
+            <td class="text-right">¥${totalTaxAmt.toLocaleString()}</td>
+        `;
+        tbody.appendChild(totalTr);
+
+        document.getElementById('p-remarks').innerText = remarksArr.length > 0 ? remarksArr.join('\n') : '特記事項なし';
+
+        if(isExplicitLock) {
+            document.getElementById('print-preview').scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+</script>
+
+</body>
+</html>
