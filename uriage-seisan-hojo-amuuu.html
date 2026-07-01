@@ -369,16 +369,15 @@
             border-right: none;
         }
 
-        /* 通常画面（スマホ縦画面用）：3段の縦積みレイアウト */
+        /* 通常画面（スマホ縦画面用）：通常は縦積み */
         .preview-bottom-layout {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
+            display: block;
             margin-top: 10px;
             width: 100%;
         }
         .bottom-left-block {
             width: 100%;
+            margin-bottom: 14px;
         }
         .denom-vertical-table {
             width: 100%;
@@ -431,22 +430,26 @@
             cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
+        
+        /* ★重要：はみ出たプレビュー用紙（750px）をスクロールさせるコンテナ */
         .modal-scroll-area {
             flex: 1;
             width: 100%;
-            overflow: auto; /* ★縦・横両方向のスクロールを有効化 */
+            overflow: auto; 
             -webkit-overflow-scrolling: touch;
-            background: #fff;
+            background: #ccc; /* プレビュー用紙が分かりやすいように背景をグレーに */
             border-radius: 8px;
-            padding: 16px;
+            padding: 12px;
         }
 
-        /* モーダル表示時に強制適用させるスタイル */
+        /* ★超重要：モーダル表示時はFlexを完全に解除し、A4横幅（750px）を絶対に潰さない枠組みにする */
         .modal-scroll-area #print-preview {
             border: none !important;
-            margin-top: 0 !important;
-            padding: 0 !important;
-            width: 750px; /* ★スマホ縦画面時でも、強制的にPDF/PCと同等の750px幅を維持（潰れ防止） */
+            margin: 0 auto !important;
+            padding: 20px !important;
+            width: 750px !important; /* 絶対固定（iPhoneの圧縮を無効化） */
+            min-width: 750px !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
         .modal-scroll-area .btn-preview-mode {
             display: none !important;
@@ -457,22 +460,35 @@
         }
         .modal-scroll-area .report-table {
             width: 100% !important;
+            min-width: 100% !important;
         }
         
-        /* モーダル内限定で「金種3：備考7」の横並びを絶対維持 */
+        /* ★モーダル内限定：Flexを使わず、浮動配置（float）で3:7の横並びを絶対維持 */
         .modal-scroll-area .preview-bottom-layout {
-            display: flex !important;
-            flex-direction: row !important;
-            justify-content: space-between !important;
-            align-items: flex-start !important;
+            display: block !important;
+            width: 100% !important;
+            clear: both !important;
+            content: "" !important;
+        }
+        .modal-scroll-area .preview-bottom-layout::after {
+            content: "";
+            display: block;
+            clear: both;
         }
         .modal-scroll-area .bottom-left-block {
-            flex: 0 0 30% !important;
-            width: 30% !important;
+            display: block !important;
+            float: left !important;
+            width: 30% !important;  /* 確実に3割をキープ */
+            margin-bottom: 0 !important;
+        }
+        .modal-scroll-area .denom-vertical-table {
+            width: 100% !important;
+            min-width: auto !important;
         }
         .modal-scroll-area .bottom-right-block {
-            flex: 0 0 68% !important;
-            width: 68% !important;
+            display: block !important;
+            float: right !important;
+            width: 67% !important; /* 確実に約7割をキープ */
         }
         .modal-scroll-area .remarks-box {
             min-height: 148px;
@@ -487,10 +503,12 @@
             .table-scroll-container { border: none; overflow-x: visible; }
             .report-table { width: 100% !important; table-layout: fixed !important; }
             
-            .preview-bottom-layout { display: flex !important; flex-direction: row !important; justify-content: space-between !important; }
-            .bottom-left-block { display: block !important; width: 30% !important; flex: 0 0 30% !important; }
+            /* 印刷時も3:7の横並びを維持 */
+            .preview-bottom-layout { display: block !important; width: 100% !important; }
+            .preview-bottom-layout::after { content: ""; display: block; clear: both; }
+            .bottom-left-block { display: block !important; float: left !important; width: 30% !important; margin-bottom: 0 !important; }
             .denom-vertical-table { display: table !important; width: 100% !important; min-width: auto !important; }
-            .bottom-right-block { display: block !important; width: 68% !important; flex: 0 0 68% !important; }
+            .bottom-right-block { display: block !important; float: right !important; width: 67% !important; }
             .remarks-box { display: block !important; }
             
             .report-header-layout { display: flex !important; }
@@ -784,7 +802,7 @@
     function calculateRowAmt(el) {
         const row = el.closest('.item-row');
         const v10000 = (parseInt(row.querySelector('.input-d10000').value) || 0) * 10000;
-        const v1000 = (parseInt(row.querySelector('.input-d1000').value) || 0) * 1000;
+        const v1000 = (parseInt(row.querySelector('.input-d1000').value) || 0) * 100;
         const v500 = (parseInt(row.querySelector('.input-d500').value) || 0) * 500;
         const v100 = (parseInt(row.querySelector('.input-d100').value) || 0) * 100;
         const total = v10000 + v1000 + v500 + v100;
@@ -919,7 +937,8 @@
         targetArea.appendChild(previewClone);
         
         document.getElementById('fullscreenModal').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        // モーダル表示中、ツール背後の本体画面スクロールを抑止
+        document.body.style.overflow = 'hidden'; 
     }
 
     function closeFullscreenPreview() {
