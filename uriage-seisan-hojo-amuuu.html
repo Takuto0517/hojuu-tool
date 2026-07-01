@@ -169,7 +169,7 @@
             background-color: var(--ss-blue-light);
         }
         
-        /* ★金種窓をコンパクトにし、右寄せ（テキストも右寄せ） */
+        /* 金種窓をコンパクトにし、右寄せ */
         input[type="number"] {
             width: 85px; 
             height: 38px;
@@ -214,7 +214,7 @@
             margin-bottom: 12px;
         }
         
-        /* 下段：金種コンテナ（縦並びのリスト形式にして右側に入力窓を配置） */
+        /* 下段：金種コンテナ */
         .denoms-container {
             display: flex;
             flex-direction: column;
@@ -224,10 +224,10 @@
             padding: 8px;
             border-radius: 8px;
             border: 1px solid #e2e8f0;
-            max-width: 240px; /* 横に広がりすぎないサイズ */
+            max-width: 240px;
         }
         
-        /* ★左側にレーベル、右側に入力窓を配置するスタイル */
+        /* 左側にレーベル、右側に入力窓 */
         .denom-field {
             display: flex;
             justify-content: space-between;
@@ -262,10 +262,12 @@
         .btn-secondary { background-color: #f1f5f9; color: #334155; border: 2px solid #cbd5e1; margin-top: 6px; }
         .btn-danger { background-color: #ef4444; color: #fff; height: 38px; width: auto; padding: 0 14px; font-size: 14px; border-radius: 6px; display: inline-flex; }
         .btn-success { background-color: #10b981; color: #fff; font-size: 16px; height: 50px; margin-top: 24px; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+        .btn-preview-mode { background-color: #0f172a; color: #fff; margin: 8px 0 14px 0; font-size: 14px; gap: 6px; height: 46px; border-radius: 8px;}
 
-        .landscape-alert { background: #eff6ff; color: #1e40af; text-align: center; padding: 10px; font-size: 12px; font-weight: bold; border-radius: 8px; margin-bottom: 14px; border: 1px solid #bfdbfe; }
+        /* ★注意書き用スタイルをプレビュー付近用として調整 */
+        .landscape-alert { background: #eff6ff; color: #1e40af; text-align: center; padding: 10px; font-size: 12px; font-weight: bold; border-radius: 8px; margin: 6px 0 12px 0; border: 1px solid #bfdbfe; }
 
-        /* プレビュー表示エリア（iPhone縦画面見切れ対策） */
+        /* プレビュー表示エリア */
         .table-scroll-container {
             width: 100%;
             overflow-x: auto;
@@ -278,7 +280,7 @@
             background: #fff;
             color: #000;
             padding: 16px;
-            margin-top: 14px;
+            margin-top: 4px;
             border: 3px solid #000;
             font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
@@ -378,6 +380,55 @@
             line-height: 1.5;
         }
 
+        /* ----------------------------------------------------
+           ★ iPhone縦持ちのまま横長全画面にするモーダル設定
+        ---------------------------------------------------- */
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .fullscreen-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: #ef4444;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px;
+            z-index: 10000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        /* 縦持ち画面内で要素を90度回転させて無理やり横長写真風にするトリック */
+        .rotate-wrapper {
+            width: 92vh;       /* 縦画面の高さに近い幅を持たせる */
+            height: 92vw;      /* 縦画面の幅に近い高さを持たせる */
+            transform: rotate(90deg); /* 90度右回転 */
+            transform-origin: center center;
+            background: #fff;
+            padding: 14px;
+            overflow-y: auto;  /* スクロール可能に */
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        /* 全画面モード中のテーブルは横スクロール不要にする */
+        .rotate-wrapper .table-scroll-container {
+            overflow-x: visible !important;
+            border: none !important;
+        }
+        .rotate-wrapper .report-table {
+            min-width: 100% !important;
+            width: 100% !important;
+        }
+
         @media print {
             body * { display: none; }
             #print-preview, #print-preview * { display: block; }
@@ -396,10 +447,6 @@
 
 <div class="container">
     <h1>ミュー専用売上報告書計算ツール</h1>
-
-    <div class="landscape-alert">
-        💡 プレビュー表は見切れる場合、指で左右にスライド（スクロール）して確認できます。
-    </div>
 
     <!-- 店舗切り替え -->
     <div class="group-toggle-container">
@@ -447,85 +494,103 @@
     ---------------------------------------------------- -->
     <div class="section-title" id="preview-section-title">📊 報告書プレビュー</div>
     
-    <!-- プレビュー枠 -->
-    <div id="print-preview">
-        <div class="report-header-layout">
-            <div>
-                <span id="p-active-store-badge" class="store-badge-preview cainz">カインズ</span>
-            </div>
-        </div>
-        
-        <div class="preview-title">ミュー専用売上金報告書</div>
+    <!-- ★ご指定の位置（プレビュー表のすぐ近く）に注意書きを移動 -->
+    <div class="landscape-alert">
+        💡 プレビュー表が見切れる場合、指で左右にスライド（スクロール）して確認できます。
+    </div>
 
-        <!-- 【上部】売上明細テーブル -->
-        <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">【売上明細内訳】（← 横スクロール可能）</div>
-        <div class="table-scroll-container">
-            <table class="report-table">
+    <!-- ★新機能：実際の全体サイズを横向き擬似画面で見るボタン -->
+    <button class="btn btn-preview-mode" onclick="openFullscreenPreview()">📱 実際のサイズ（横向き全画面）で全体を確認</button>
+    
+    <!-- プレビュー枠 -->
+    <div id="print-preview-zone">
+        <div id="print-preview">
+            <div class="report-header-layout">
+                <div>
+                    <span id="p-active-store-badge" class="store-badge-preview cainz">カインズ</span>
+                </div>
+            </div>
+            
+            <div class="preview-title">ミュー専用売上金報告書</div>
+
+            <!-- 【上部】売上明細テーブル -->
+            <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">【売上明細内訳】</div>
+            <div class="table-scroll-container">
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 6%;">No</th>
+                            <th style="width: 35%;">ジャンル名</th>
+                            <th style="width: 17%;">売上送信コード</th>
+                            <th style="width: 14%;">集金額(税込)</th>
+                            <th style="width: 14%;">売上金(税抜)</th>
+                            <th style="width: 14%;">消費税</th>
+                        </tr>
+                    </thead>
+                    <tbody id="p-main-tbody">
+                        <!-- JavaScriptにより生成 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 【下部】金種別現金残高テーブル -->
+            <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">【金種別現金残高】</div>
+            <table class="report-table denom-vertical-table">
                 <thead>
                     <tr>
-                        <th style="width: 6%;">No</th>
-                        <th style="width: 35%;">ジャンル名</th>
-                        <th style="width: 17%;">売上送信コード</th>
-                        <th style="width: 14%;">集金額(税込)</th>
-                        <th style="width: 14%;">売上金(税抜)</th>
-                        <th style="width: 14%;">消費税</th>
+                        <th style="width: 35%;">金種</th>
+                        <th style="width: 25%;">枚数</th>
+                        <th style="width: 40%;">金額</th>
                     </tr>
                 </thead>
-                <tbody id="p-main-tbody">
-                    <!-- JavaScriptにより生成 -->
+                <tbody>
+                    <tr>
+                        <td>10,000円</td>
+                        <td id="p-count-10000" class="text-right">-</td>
+                        <td id="p-amt-10000" class="text-right">-</td>
+                    </tr>
+                    <tr>
+                        <td>1,000円</td>
+                        <td id="p-count-1000" class="text-right">-</td>
+                        <td id="p-amt-1000" class="text-right">-</td>
+                    </tr>
+                    <tr>
+                        <td>500円</td>
+                        <td id="p-count-500" class="text-right">-</td>
+                        <td id="p-amt-500" class="text-right">-</td>
+                    </tr>
+                    <tr>
+                        <td>100円</td>
+                        <td id="p-count-100" class="text-right">-</td>
+                        <td id="p-amt-100" class="text-right">-</td>
+                    </tr>
+                    <tr style="font-weight: bold; background-color: #f2f2f2;">
+                        <td>合計</td>
+                        <td id="p-count-total" class="text-right">0</td>
+                        <td id="p-amt-total" class="text-right">¥0</td>
+                    </tr>
                 </tbody>
             </table>
-        </div>
 
-        <!-- 【下部】金種別現金残高テーブル -->
-        <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">【金種別現金残高】</div>
-        <table class="report-table denom-vertical-table">
-            <thead>
-                <tr>
-                    <th style="width: 35%;">金種</th>
-                    <th style="width: 25%;">枚数</th>
-                    <th style="width: 40%;">金額</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>10,000円</td>
-                    <td id="p-count-10000" class="text-right">-</td>
-                    <td id="p-amt-10000" class="text-right">-</td>
-                </tr>
-                <tr>
-                    <td>1,000円</td>
-                    <td id="p-count-1000" class="text-right">-</td>
-                    <td id="p-amt-1000" class="text-right">-</td>
-                </tr>
-                <tr>
-                    <td>500円</td>
-                    <td id="p-count-500" class="text-right">-</td>
-                    <td id="p-amt-500" class="text-right">-</td>
-                </tr>
-                <tr>
-                    <td>100円</td>
-                    <td id="p-count-100" class="text-right">-</td>
-                    <td id="p-amt-100" class="text-right">-</td>
-                </tr>
-                <tr style="font-weight: bold; background-color: #f2f2f2;">
-                    <td>合計</td>
-                    <td id="p-count-total" class="text-right">0</td>
-                    <td id="p-amt-total" class="text-right">¥0</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- 最下部：備考欄 -->
-        <div class="remarks-wrapper">
-            <div style="font-size:11px; font-weight:bold; margin-bottom:6px;">（備考欄）内訳別アイテム詳細:</div>
-            <div class="remarks-box" id="p-remarks"></div>
+            <!-- 最下部：備考欄 -->
+            <div class="remarks-wrapper">
+                <div style="font-size:11px; font-weight:bold; margin-bottom:6px;">（備考欄）内訳別アイテム詳細:</div>
+                <div class="remarks-box" id="p-remarks"></div>
+            </div>
         </div>
     </div>
 
     <!-- リセットボタン（外側） -->
     <div style="margin-top: 20px; text-align: center;">
         <button class="btn btn-danger" style="width:auto; display:inline-flex; padding:0 30px; height:46px; font-size:15px;" onclick="resetInputFields()">🔄 入力内容をすべてリセット</button>
+    </div>
+</div>
+
+<!-- ★横長全画面プレビュー用のポップアップ用裏画面 -->
+<div id="fullscreenModal" class="fullscreen-overlay">
+    <button class="fullscreen-close-btn" onclick="closeFullscreenPreview()">✕ 閉じる</button>
+    <div class="rotate-wrapper" id="modal-content-area">
+        <!-- ここにプレビューのコピーが丸ごと入り、90度回転します -->
     </div>
 </div>
 
@@ -630,7 +695,7 @@
         const denoms = ['10000', '1000', '500', '100'];
         denoms.forEach(d => {
             const isChecked = document.getElementById(`chk-v${d}`).checked;
-            document.querySelectorAll(`.df-${d}`).forEach(el => el.style.display = isChecked ? 'flex' : 'none'); // flexにして左右に並べる
+            document.querySelectorAll(`.df-${d}`).forEach(el => el.style.display = isChecked ? 'flex' : 'none');
         });
         processCalculations();
     }
@@ -799,6 +864,27 @@
         if(isExplicitLock) {
             document.getElementById('preview-section-title').scrollIntoView({ behavior: 'smooth' });
         }
+    }
+
+    // ★全画面擬似横向きプレビューを開く処理
+    function openFullscreenPreview() {
+        processCalculations(); // 最新の状態に計算
+        const previewClone = document.getElementById('print-preview').cloneNode(true);
+        // クローン側からはid属性を外して干渉を防ぐ
+        previewClone.removeAttribute('id');
+        
+        const targetArea = document.getElementById('modal-content-area');
+        targetArea.innerHTML = '';
+        targetArea.appendChild(previewClone);
+        
+        document.getElementById('fullscreenModal').style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // 背面のスクロールを固定
+    }
+
+    // 全画面プレビューを閉じる処理
+    function closeFullscreenPreview() {
+        document.getElementById('fullscreenModal').style.display = 'none';
+        document.body.style.overflow = ''; // スクロール解除
     }
 </script>
 
