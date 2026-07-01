@@ -275,9 +275,6 @@
             background-color: #0040a3;
         }
 
-        /* 注意書きスタイル */
-        .landscape-alert { background: #eff6ff; color: #1e40af; text-align: center; padding: 10px; font-size: 12px; font-weight: bold; border-radius: 8px; margin: 6px 0 12px 0; border: 1px solid #bfdbfe; }
-
         /* プレビュー表示エリア */
         .table-scroll-container {
             width: 100%;
@@ -372,35 +369,25 @@
             border-right: none;
         }
 
-        /* ★【重要】通常表示（スマホ縦画面）では3段構成（縦に並ぶ）にするベース設定 */
+        /* ----------------------------------------------------
+           通常画面（スマホ縦画面用）：3段の縦積みレイアウト
+        ---------------------------------------------------- */
         .preview-bottom-layout {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            margin-top: 14px;
+            gap: 14px;
+            margin-top: 10px;
             width: 100%;
         }
-
-        /* 縦積み時の金種ブロック（スマホ画面いっぱいに広く使う） */
         .bottom-left-block {
             width: 100%;
         }
-        
-        /* 縦積み時の金種テーブルを100%幅に引き伸ばす */
         .denom-vertical-table {
-            width: 100% !important;
-            max-width: 100% !important;
-            min-width: 0 !important;
-            margin-bottom: 0 !important;
+            width: 100%;
         }
-
-        /* 縦積み時の備考欄ブロック */
         .bottom-right-block {
             width: 100%;
-            display: flex;
-            flex-direction: column;
         }
-        
         .remarks-box {
             border: 1px solid #000;
             padding: 10px;
@@ -412,7 +399,9 @@
             width: 100%;
         }
 
-        /* 全画面表示モーダル裏画面 */
+        /* ----------------------------------------------------
+           全体プレビュー（モーダル全画面用）：横並び（比率 3:7）
+        ---------------------------------------------------- */
         .fullscreen-overlay {
             display: none;
             position: fixed;
@@ -455,12 +444,12 @@
             padding: 16px;
         }
 
-        /* モーダル表示時の調整スタイル（強制引き伸ばしを防止） */
+        /* モーダル表示時に強制適用させるスタイル（重なり・潰れバグを完全防止） */
         .modal-scroll-area #print-preview {
             border: none !important;
             margin-top: 0 !important;
             padding: 0 !important;
-            width: 750px; /* 印刷に最適なベース幅に固定 */
+            width: 750px; /* PC・A4印刷の標準幅に完全固定 */
         }
         .modal-scroll-area .btn-preview-mode {
             display: none !important;
@@ -473,32 +462,26 @@
             width: 100% !important;
         }
         
-        /* ★【修正】全体プレビュー（モーダル）内限定で、強制的に横並び・比率を維持（左3割：右7割） */
+        /* ★モーダル内限定で「金種3：備考7」の横並びを絶対維持 */
         .modal-scroll-area .preview-bottom-layout {
             display: flex !important;
             flex-direction: row !important;
             justify-content: space-between !important;
-            align-items: stretch !important;
-            gap: 20px !important;
+            align-items: flex-start !important;
         }
         .modal-scroll-area .bottom-left-block {
+            flex: 0 0 30% !important;  /* 幅30%を完全に固定 */
             width: 30% !important;
-            flex: 0 0 30% !important;
-            min-width: 0 !important;
-        }
-        .modal-scroll-area .denom-vertical-table {
-            width: 100% !important;
-            max-width: 100% !important;
         }
         .modal-scroll-area .bottom-right-block {
+            flex: 0 0 68% !important;  /* 幅68%を完全に固定（被り回避の2%マージン） */
             width: 68% !important;
-            flex: 0 0 68% !important;
-            min-width: 0 !important;
         }
         .modal-scroll-area .remarks-box {
-            min-height: 150px !important; /* 金種表の高さと完璧に合わせる */
+            min-height: 148px; /* 金種表の高さとバランスを取る */
         }
 
+        /* 印刷時の用紙レイアウト設定 */
         @media print {
             body * { display: none; }
             #print-preview, #print-preview * { display: block; }
@@ -507,7 +490,7 @@
             .table-scroll-container { border: none; overflow-x: visible; }
             .report-table { width: 100% !important; table-layout: fixed !important; }
             
-            /* 印刷時も横並び・比率を完全に固定 */
+            /* 印刷時も「金種3：備考7」の横並びを適用 */
             .preview-bottom-layout { display: flex !important; flex-direction: row !important; justify-content: space-between !important; }
             .bottom-left-block { display: block !important; width: 30% !important; flex: 0 0 30% !important; }
             .denom-vertical-table { display: table !important; width: 100% !important; }
@@ -527,14 +510,12 @@
 <div class="container">
     <h1>ミュー専用売上報告書計算ツール</h1>
 
-    <!-- 店舗切り替え -->
     <div class="group-toggle-container">
         <button type="button" class="group-btn active" data-group="cainz" onclick="setStoreGroup('cainz')">カインズ</button>
         <button type="button" class="group-btn" data-group="beisia" onclick="setStoreGroup('beisia')">ベイシア</button>
     </div>
     <input type="hidden" id="meta-store-group" value="cainz">
 
-    <!-- 金種表示設定 -->
     <div class="ss-accordion">
         <div class="ss-accordion-header" onclick="toggleSSAccordion('acc-denom', 'arrow-denom')">
             <span>🔍 表示する金種を選択</span>
@@ -550,7 +531,6 @@
         </div>
     </div>
 
-    <!-- ジャンル別アイテムフィルター設定 -->
     <div class="ss-accordion">
         <div class="ss-accordion-header" onclick="toggleSSAccordion('acc-genre', 'arrow-genre')">
             <span>🔍 表示するカテゴリーを選択</span>
@@ -561,21 +541,14 @@
         </div>
     </div>
 
-    <!-- 内訳・枚数入力 -->
     <div class="section-title">内訳・枚数入力</div>
     <div class="card" id="input-rows-container"></div>
     <button class="btn btn-secondary" onclick="addInputRow()">+ 新しい内訳入力行を追加</button>
 
     <button class="btn btn-success" onclick="processCalculations(true)">最終確定してプレビューへスクロール</button>
 
-    <!-- 報告書プレビュー表示エリア -->
     <div class="section-title" id="preview-section-title">📊 報告書プレビュー</div>
     
-    <div class="landscape-alert">
-        💡 プレビュー表は見切れる場合、指で左右にスライド（スクロール）して確認できます。
-    </div>
-    
-    <!-- プレビュー枠 -->
     <div id="print-preview-zone">
         <div id="print-preview">
             <div class="report-header-layout">
@@ -586,8 +559,10 @@
             
             <div class="preview-title">ミュー専用売上金報告書</div>
 
-            <!-- 【上部】売上明細テーブル -->
-            <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">【売上明細内訳】</div>
+            <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                <span>【売上明細内訳】</span>
+                <span style="font-size: 11px; color: #0052cc; font-weight: normal; letter-spacing: 0.5px;">※→左にスクロールして全体を確認</span>
+            </div>
             <div class="table-scroll-container">
                 <table class="report-table">
                     <thead>
@@ -601,15 +576,12 @@
                         </tr>
                     </thead>
                     <tbody id="p-main-tbody">
-                        <!-- JavaScriptにより生成 -->
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
 
-            <!-- ★スマホ画面では縦3段積み／全体プレビュー（モーダル）内では左右2カラムに変化する新設計 -->
             <div class="preview-bottom-layout">
                 
-                <!-- 【中段】金種別現金残高テーブル（スマホ画面では100%幅でバシッと綺麗に表示） -->
                 <div class="bottom-left-block">
                     <div style="font-size: 12px; font-weight: bold; margin-bottom: 6px;">【金種別現金残高】</div>
                     <table class="report-table denom-vertical-table">
@@ -650,9 +622,7 @@
                     </table>
                 </div>
 
-                <!-- 【下段】備考欄エリア -->
                 <div class="bottom-right-block">
-                    <!-- ★「（備考欄）」というシンプルな表記へ統合しました -->
                     <div style="font-size:12px; font-weight:bold; margin-bottom:6px;">（備考欄）</div>
                     <div class="remarks-box" id="p-remarks"></div>
                 </div>
@@ -663,32 +633,29 @@
         </div>
     </div>
 
-    <!-- リセットボタン -->
     <div style="margin-top: 20px; text-align: center;">
         <button class="btn btn-danger" style="width:auto; display:inline-flex; padding:0 30px; height:46px; font-size:15px;" onclick="resetInputFields()">🔄 入力内容をすべてリセット</button>
     </div>
 </div>
 
-<!-- 全画面表示モーダル裏画面 -->
 <div id="fullscreenModal" class="fullscreen-overlay">
     <div class="fullscreen-header">
         <span class="fullscreen-mode-title">📄 全体プレビュー（実際の印刷レイアウト）</span>
         <button class="fullscreen-close-btn" onclick="closeFullscreenPreview()">✕ 閉じる</button>
     </div>
     <div class="modal-scroll-area" id="modal-content-area">
-        <!-- ここにプレビューがコピーされます -->
-    </div>
+        </div>
 </div>
 
 <script>
     const genreMaster = [
         { id: 0, name: "ミューオリジナル①", cainz: "10154", beisia: "05983", items: ["ゆるキャン"] },
         { id: 1, name: "他社カプセル", cainz: "09407", beisia: "07196", items: ["カプセル"] },
-        { id: 2, name: "挂高①", cainz: "09660", beisia: "07471", items: ["ちいかわ", "仮面ライダー連動", "ケンアンパンマン"] },
+        { id: 2, name: "掛高①", cainz: "09660", beisia: "07471", items: ["ちいかわ", "仮面ライダー連動", "ケンアンパンマン"] },
         { id: 3, name: "バンダイカプセル", cainz: "09733", beisia: "07625", items: ["カードダス", "Jカードダス", "バンダイカプセル"] },
         { id: 4, name: "ゲーム", cainz: "09792", beisia: "07749", items: ["ぴよりーな", "ぴよりーな（すみっコぐらし）", "ぴよりーな（カービィ）", "ぴよりーな（レア）", "ぴよりーな（ハーフ）プチプリムルミエール", "トリプルミニクレーンクリスタル", "Gキャッチャーライトミニ", "ME‐01"] },
-        { id: 5, name: "ミューオリジナル挂高②", cainz: "52787", beisia: "50032", items: ["東武プラレール"] },
-        { id: 6, name: "ミューオリジナル挂高③", cainz: "52795", beisia: "50040", items: ["高崎だるま"] }
+        { id: 5, name: "ミューオリジナル掛高②", cainz: "52787", beisia: "50032", items: ["東武プラレール"] },
+        { id: 6, name: "ミューオリジナル掛高③", cainz: "52795", beisia: "50040", items: ["高崎だるま"] }
     ];
 
     window.onload = function() {
@@ -706,7 +673,7 @@
     }
 
     function resetInputFields() {
-        if(!confirm("内訳と枚数入力をすべてクリアします。よろしいですか？")) return;
+        if(!confirm("内訳と枚数入力をすべてクリアします。よろしいですか？\n(※カテゴリーや金種の表示設定は維持されます)")) return;
         initDefaultRows();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
